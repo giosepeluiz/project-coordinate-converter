@@ -1,103 +1,82 @@
-import Image from "next/image";
+// src/app/page.tsx
+"use client";
+
+import Card from "@/components/card/page";
+import { useState } from "react";
+import { convertCoordinates } from "./function/localizationConvert";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [coordinates, setCoordinates] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const coordData = formData.get("coord");
+
+    // OTIMIZAÇÃO: Usa trim() para remover espaços no início/fim,
+    // mas preserva os espaços internos necessários para o formato DMS.
+    // O .replace(" ", "") anterior era um bug, pois removia apenas o primeiro espaço.
+    setCoordinates(coordData ? coordData.toString().trim() : "");
+  };
+
+  // OTIMIZAÇÃO: A lógica de renderização foi movida para fora do JSX.
+  // Isso torna o bloco de retorno (return) mais limpo e focado na estrutura da UI.
+  const renderCards = () => {
+    if (!coordinates) return null;
+
+    // Determina se o formato original é DMS (contém '°')
+    const isDmsFormat = coordinates.includes("°");
+
+    // O card 'localization' sempre mostra o formato convertido.
+    const localizationCardCoords = convertCoordinates(coordinates);
+
+    // Os apps de mapa (Waze, Google, Apple) precisam do formato decimal.
+    // Se o original for DMS, converte. Se já for decimal, usa como está.
+    const mapAppsCoords = isDmsFormat
+      ? convertCoordinates(coordinates.replace(" ", ""))
+      : coordinates.replace(" ", "");
+
+    return (
+      <>
+        <Card coordinates={localizationCardCoords} type="localization" />
+        <Card coordinates={mapAppsCoords} type="waze" />
+        <Card coordinates={mapAppsCoords} type="googlemaps" />
+        <Card coordinates={mapAppsCoords} type="applemaps" />
+      </>
+    );
+  };
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24">
+      <div className="flex flex-col items-center justify-center w-full max-w-3xl p-6 bg-white rounded-lg shadow-md">
+        <h1 className="p-7 text-2xl md:text-3xl font-bold text-[#0F9D58] text-center">
+          Conversor de Coordenadas
+        </h1>
+
+        <form
+          className="flex flex-col sm:flex-row w-full justify-between items-center p-4 sm:p-7 gap-4"
+          onSubmit={handleSubmit}>
+          <label htmlFor="coord" className="font-semibold text-gray-700">
+            Coordenadas:
+          </label>
+          <input
+            type="text"
+            id="coord"
+            name="coord"
+            placeholder="Ex: 40.7128,-74.0060 ou 40&#176;42&#39;46.08&#34;N, 74&#176;0&#39;21.60&#34;W"
+            className="border border-gray-300 rounded-md w-full sm:w-2/3 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            required
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <button
+            type="submit"
+            className="bg-blue-500 rounded-md py-2 px-4 text-white font-semibold hover:bg-sky-700 transition-colors duration-300 w-full sm:w-auto">
+            Converter
+          </button>
+        </form>
+      </div>
+
+      {/* A chamada da função torna o JSX principal mais limpo */}
+      {renderCards()}
+    </main>
   );
 }
