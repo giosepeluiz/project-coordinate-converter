@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Conversor de Coordenadas
 
-## Getting Started
+Este projeto é um conversor de coordenadas geográficas entre os formatos Graus Decimais (DD) e Graus, Minutos e Segundos (DMS), além de gerar links para navegação em aplicativos de mapas como Waze, Google Maps e Apple Maps.
 
-First, run the development server:
+## Funcionalidades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Conversão automática** entre os formatos DD e DMS.
+- **Geração de links** para navegação em Waze, Google Maps e Apple Maps usando as coordenadas fornecidas.
+- Interface simples e responsiva, desenvolvida com Next.js e Tailwind CSS.
+
+## Como funciona
+
+1. O usuário insere uma coordenada no formato DD (ex: `40.7128,-74.0060`) ou DMS (ex: `40° 42' 46.08"N, 74° 0' 21.60"W`).
+2. O sistema detecta automaticamente o formato e realiza a conversão para o outro formato.
+3. São exibidos cards com:
+   - A coordenada convertida.
+   - Links prontos para abrir a localização nos principais aplicativos de mapas.
+
+## Estrutura do Projeto
+
+```
+src/
+  app/
+    function/
+      localizationConvert.ts      # Funções de conversão de coordenadas
+    layout.tsx                    # Layout global da aplicação
+    page.tsx                      # Página principal e lógica de UI
+    globals.css                   # Estilos globais (Tailwind)
+  components/
+    card/
+      page.tsx                    # Componente de exibição dos cards de resultado
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Detalhamento dos Arquivos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### src/app/function/localizationConvert.ts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Implementa as funções:
+  - `convertCoordinates`: Detecta o formato e converte entre DD e DMS.
+  - Funções auxiliares privadas para conversão:
+    - `dmsToDecimal`: DMS → DD
+    - `decimalToDms`: DD → DMS
 
-## Learn More
+### src/app/page.tsx
 
-To learn more about Next.js, take a look at the following resources:
+- Componente principal da aplicação.
+- Gerencia o estado do input do usuário.
+- Chama as funções de conversão e renderiza os cards de resultado usando o componente `Card`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### src/components/card/page.tsx
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Define o componente `Card` e o objeto de configuração dos tipos de card.
+- Cada card exibe:
+  - O título (tipo de conversão ou app de mapa).
+  - O conteúdo (coordenada convertida ou link para o app).
 
-## Deploy on Vercel
+### src/app/layout.tsx
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Define o layout global da aplicação, incluindo fontes e estilos globais.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### src/app/globals.css
+
+- Importa o Tailwind CSS para estilização.
+
+## Como rodar o projeto
+
+1. Instale as dependências:
+   ```sh
+   npm install
+   ```
+2. Rode o servidor de desenvolvimento:
+   ```sh
+   npm run dev
+   ```
+3. Acesse [http://localhost:3000](http://localhost:3000) no navegador.
+
+## Exemplos de uso
+
+- **Entrada DD:**  
+  `40.7128,-74.0060`
+- **Entrada DMS:**  
+  `40° 42' 46.08"N, 74° 0' 21.60"W`
+
+O sistema irá converter e exibir ambos os formatos, além dos links para navegação.
+
+## Licença
+
+Este projeto é livre para uso educacional e pessoal.
+
+---
+
+Desenvolvido por Giosepe Luiz
