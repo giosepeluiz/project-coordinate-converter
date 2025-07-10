@@ -10,13 +10,25 @@
  */
 export function convertCoordinates(coordinates: string): string {
   // Verifica se a coordenada está no formato DMS (contém °)
-  const isDmsFormat = coordinates.includes('°');
+  const isDmsFormat = coordinates.includes("°");
+  const hasComma = coordinates.includes(",");
 
-  if (isDmsFormat) {
-    return dmsToDecimal(coordinates);
-  } else {
-    return decimalToDms(coordinates);
+  // Se não houver vírgula, assume que é DMS e adiciona uma vírgula entre latitude e longitude
+  if (hasComma && isDmsFormat) {
+    if (isDmsFormat) {
+      return dmsToDecimal(coordinates);
+    } else {
+      return decimalToDms(coordinates);
+    }
+  } else if (!hasComma && isDmsFormat) {
+    // Se for DMS sem vírgula, assume que é uma coordenada única e converte
+    return coordinates.includes("N")
+      ? dmsToDecimal(coordinates.replace("N", "N,"))
+      : dmsToDecimal(coordinates.replace("S", "S,"));
   }
+
+  // Se não for DMS, assume que é decimal
+  return decimalToDms(coordinates);
 }
 
 /**
@@ -25,8 +37,9 @@ export function convertCoordinates(coordinates: string): string {
  * @returns String no formato DD, ex: "40.7128,-74.0060"
  */
 function dmsToDecimal(dmsCoord: string): string {
-  const parts = dmsCoord.split(',');
-  if (parts.length !== 2) throw new Error("Formato DMS inválido. Esperado 'latitude, longitude'.");
+  const parts = dmsCoord.split(",");
+  if (parts.length !== 2)
+    throw new Error("Formato DMS inválido. Esperado 'latitude, longitude'.");
 
   const latPart = parts[0].trim();
   const lonPart = parts[1].trim();
@@ -43,10 +56,10 @@ function dmsToDecimal(dmsCoord: string): string {
     const seconds = parseFloat(match[3]);
     const direction = match[4].toUpperCase();
 
-    let decimal = degrees + (minutes / 60) + (seconds / 3600);
+    let decimal = degrees + minutes / 60 + seconds / 3600;
 
     // Aplica o sinal negativo para Sul e Oeste
-    if (direction === 'S' || direction === 'W') {
+    if (direction === "S" || direction === "W") {
       decimal *= -1;
     }
 
@@ -66,8 +79,9 @@ function dmsToDecimal(dmsCoord: string): string {
  * @returns String no formato DMS, ex: "40° 42' 46.08" N, 74° 0' 21.60" W"
  */
 function decimalToDms(decimalCoord: string): string {
-  const parts = decimalCoord.split(',');
-  if (parts.length !== 2) throw new Error("Formato decimal inválido. Esperado 'latitude,longitude'.");
+  const parts = decimalCoord.split(",");
+  if (parts.length !== 2)
+    throw new Error("Formato decimal inválido. Esperado 'latitude,longitude'.");
 
   const latDecimal = parseFloat(parts[0]);
   const lonDecimal = parseFloat(parts[1]);
@@ -78,12 +92,16 @@ function decimalToDms(decimalCoord: string): string {
 
   const getDmsPart = (decimal: number, isLatitude: boolean): string => {
     // Define a direção (N/S para latitude, E/W para longitude)
-    const direction = isLatitude 
-      ? decimal >= 0 ? 'N' : 'S' 
-      : decimal >= 0 ? 'E' : 'W';
-      
+    const direction = isLatitude
+      ? decimal >= 0
+        ? "N"
+        : "S"
+      : decimal >= 0
+      ? "E"
+      : "W";
+
     const absDecimal = Math.abs(decimal);
-    
+
     const degrees = Math.floor(absDecimal);
     const minutesDecimal = (absDecimal - degrees) * 60;
     const minutes = Math.floor(minutesDecimal);

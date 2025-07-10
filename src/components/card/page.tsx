@@ -15,6 +15,8 @@ type CardContentProps = {
 // Objeto de configuração para os cards.
 // Facilita a manutenção e a adição de novos tipos de mapa.
 const cardConfig = {
+  // Geração do conteúdo dos cards com base no tipo.
+  // Cada tipo de card tem um título e uma função para gerar o conteúdo.
   localization: {
     title: "Coordenadas Convertidas",
     getContent: (coordinates: string) => coordinates,
