@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 type CardType = "localization" | "waze" | "googlemaps" | "applemaps";
 
@@ -90,11 +91,11 @@ function CardContent({ title, content, logo }: CardContentProps) {
       {!logo && <span className="text-sky-700 font-bold mb-3">{title}:</span>}
       <div className="flex items-center gap-2 w-full">
         {logo && (
-          <img
+          <Image
             src={logo}
             alt={title}
-            width="40"
-            height="40"
+            width={40}
+            height={40}
             className="flex-shrink-0"
           />
         )}

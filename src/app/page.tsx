@@ -3,7 +3,7 @@
 
 import Card from "@/components/card/page";
 import { useState, useEffect } from "react";
-import { useSearchParams, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { convertCoordinates } from "./function/localizationConvert";
 import {
   extractCoordinatesFromUrl,
@@ -12,7 +12,6 @@ import {
 
 export default function Home() {
   const searchParams = useSearchParams();
-  const pathname = usePathname();
   const [coordinates, setCoordinates] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
