@@ -2,8 +2,8 @@
 "use client";
 
 import Card from "@/components/card/page";
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { CoordinateProvider } from "@/components/coordinate-provider";
+import { useState, useEffect, Suspense } from "react";
 import { convertCoordinates } from "./function/localizationConvert";
 import {
   extractCoordinatesFromUrl,
@@ -11,7 +11,6 @@ import {
 } from "./function/extractCoordinates";
 
 export default function Home() {
-  const searchParams = useSearchParams();
   const [coordinates, setCoordinates] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -19,16 +18,10 @@ export default function Home() {
   const [showCards, setShowCards] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Lê coordenadas da URL ao carregar a página
-  useEffect(() => {
-    // Lê coordenadas do query param ?coord=
-    const coordFromUrl = searchParams.get("coord");
-
-    if (coordFromUrl) {
-      setInputValue(coordFromUrl);
-      processCoordinates(coordFromUrl);
-    }
-  }, [searchParams]);
+  const handleCoordinatesFromUrl = (coords: string) => {
+    setInputValue(coords);
+    processCoordinates(coords);
+  };
 
   // Efeito parallax avançado do mouse no mapa de background
   useEffect(() => {
@@ -270,6 +263,11 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Provedor de coordenadas via URL */}
+      <Suspense fallback={null}>
+        <CoordinateProvider onCoordinatesFromUrl={handleCoordinatesFromUrl} />
+      </Suspense>
 
       {/* Skeleton loading ou cards com animação */}
       {isLoading && renderSkeletons()}
