@@ -26,19 +26,25 @@ const cardConfig = {
   // Cada tipo de card tem um título e uma função para gerar o conteúdo.
   localization: {
     title: "Coordenada Identificada",
-    logo: null,
+    logo: null as string | null,
     dualFormat: true,
     getContent: (coordinates: string) => coordinates,
   },
   waze: {
     title: "Waze",
-    logo: "https://files.brandlogos.net/svg/KWGOdcgoGJ/waze-app-icon-logo-brandlogos.net_izn3bglse.svg",
+    logo: "https://files.brandlogos.net/svg/KWGOdcgoGJ/waze-app-icon-logo-brandlogos.net_izn3bglse.svg" as
+      | string
+      | null,
+    dualFormat: false,
     getContent: (coordinates: string) =>
       `https://waze.com/ul?ll=${coordinates}&navigate=yes`,
   },
   googlemaps: {
     title: "Google Maps",
-    logo: "https://files.brandlogos.net/svg/KWGOdcgoGJ/google-maps-icon-2015-2020-logo-brandlogos.net_bi22csaxl.svg",
+    logo: "https://files.brandlogos.net/svg/KWGOdcgoGJ/google-maps-icon-2015-2020-logo-brandlogos.net_bi22csaxl.svg" as
+      | string
+      | null,
+    dualFormat: false,
     // CORREÇÃO: A URL estava incorreta. A URL correta usa o domínio principal
     // do Google Maps e o parâmetro 'q' para a busca de coordenadas.
     getContent: (coordinates: string) =>
@@ -46,7 +52,10 @@ const cardConfig = {
   },
   applemaps: {
     title: "Apple Maps",
-    logo: "https://help.apple.com/assets/67DB5D0B6C81B6F14104363D/67DB5D0CE0782BA13E094088/pt_PT/0cb1025a905b01f8e1e50e4288ff3e95.png",
+    logo: "https://help.apple.com/assets/67DB5D0B6C81B6F14104363D/67DB5D0CE0782BA13E094088/pt_PT/0cb1025a905b01f8e1e50e4288ff3e95.png" as
+      | string
+      | null,
+    dualFormat: false,
     // CORREÇÃO: A URL estava incorreta. O parâmetro correto é 'll'.
     getContent: (coordinates: string) =>
       `https://maps.apple.com/place?coordinate=${coordinates}`,
