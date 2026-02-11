@@ -9,6 +9,7 @@ import {
   extractCoordinatesFromUrl,
   extractCoordinatesFromUrlAsync,
 } from "./function/extractCoordinates";
+import QRCode from "qrcode";
 
 export default function Home() {
   const [coordinates, setCoordinates] = useState("");
@@ -17,6 +18,8 @@ export default function Home() {
   const [inputValue, setInputValue] = useState("");
   const [showCards, setShowCards] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
 
   const handleCoordinatesFromUrl = (coords: string) => {
     setInputValue(coords);
@@ -171,6 +174,44 @@ export default function Home() {
     copyToClipboard(shareUrl);
   };
 
+  const handleGenerateQRCode = async () => {
+    if (!coordinates) return;
+
+    // Determina o formato decimal para a URL
+    const isDmsFormat = coordinates.includes("°");
+    const decimalCoords = isDmsFormat
+      ? convertCoordinates(coordinates.replace(" ", ""))
+      : coordinates.replace(" ", "");
+
+    // Cria a URL de localização que será codificada no QR code
+    const locationUrl = `geo:${decimalCoords}`;
+
+    try {
+      // Gera o QR code como data URL
+      const qrDataUrl = await QRCode.toDataURL(locationUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+
+      setQrCodeDataUrl(qrDataUrl);
+      setShowQRModal(true);
+    } catch (error) {
+      console.error("Erro ao gerar QR Code:", error);
+    }
+  };
+
+  const handleClearInput = () => {
+    setInputValue("");
+    setCoordinates("");
+    setError("");
+    setShowCards(false);
+    window.history.replaceState({}, "", "/");
+  };
+
   const copyToClipboard = async (text: string) => {
     try {
       if (navigator?.clipboard?.writeText) {
@@ -308,16 +349,41 @@ export default function Home() {
             name="coord"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onClick={(e) => (e.target as HTMLInputElement).select()}
             placeholder="Ex: 40.7128,-74.0060 ou URL de mapa"
             className="border border-gray-300 rounded-md w-full sm:w-2/3 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             required
           />
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="bg-blue-500 rounded-md py-2 px-4 text-white font-semibold hover:bg-sky-700 transition-colors duration-300 w-full sm:w-auto disabled:bg-gray-400 disabled:cursor-not-allowed">
-            {isLoading ? "Processando..." : "Converter"}
-          </button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={handleClearInput}
+              className="bg-orange-500 rounded-md py-2 px-4 text-white font-semibold hover:bg-orange-600 transition-colors duration-300 flex items-center justify-center"
+              title="Limpar campo">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="bg-blue-500 rounded-md py-2 px-4 text-white font-semibold hover:bg-sky-700 transition-colors duration-300 w-full sm:w-auto disabled:bg-gray-400 disabled:cursor-not-allowed">
+              {isLoading ? "Processando..." : "Converter"}
+            </button>
+          </div>
         </form>
 
         {error && (
@@ -342,9 +408,29 @@ export default function Home() {
       {isLoading && renderSkeletons()}
       {!isLoading && renderCards()}
 
-      {/* Botão de Compartilhar */}
+      {/* Botões de Gerar QRCode e Compartilhar */}
       {!isLoading && coordinates && (
-        <div className="flex justify-center w-full max-w-3xl mt-6 px-6">
+        <div className="flex justify-center gap-4 w-full max-w-3xl mt-6 px-6">
+          <button
+            onClick={handleGenerateQRCode}
+            className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Gerar QRCode
+          </button>
           <button
             onClick={handleShare}
             className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
@@ -366,6 +452,35 @@ export default function Home() {
             </svg>
             Compartilhar
           </button>
+        </div>
+      )}
+
+      {/* Modal do QRCode */}
+      {showQRModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowQRModal(false)}>
+          <div
+            className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4 animate-fade-in"
+            onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+              QR Code da Localização
+            </h2>
+            {qrCodeDataUrl && (
+              <div className="flex justify-center mb-6">
+                <img
+                  src={qrCodeDataUrl}
+                  alt="QR Code"
+                  className="w-64 h-64 border-4 border-gray-200 rounded-lg"
+                />
+              </div>
+            )}
+            <button
+              onClick={() => setShowQRModal(false)}
+              className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+              Fechar
+            </button>
+          </div>
         </div>
       )}
     </main>

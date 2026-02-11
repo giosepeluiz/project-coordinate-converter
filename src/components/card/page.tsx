@@ -123,7 +123,7 @@ function CardContent({ title, content, logo, dualFormat }: CardContentProps) {
           <div className="flex items-center gap-2 flex-1">
             <code
               onClick={() => handleCopy(format1, false)}
-              className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-x-auto break-all transition-all duration-300 cursor-pointer hover:bg-gray-300 ${
+              className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 cursor-pointer hover:bg-gray-300 ${
                 copied ? "ring-2 ring-green-500 bg-green-50" : ""
               }`}
               title="Clique para copiar">
@@ -165,7 +165,7 @@ function CardContent({ title, content, logo, dualFormat }: CardContentProps) {
           <div className="flex items-center gap-2 flex-1">
             <code
               onClick={() => handleCopy(format2, true)}
-              className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-x-auto break-all transition-all duration-300 cursor-pointer hover:bg-gray-300 ${
+              className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 cursor-pointer hover:bg-gray-300 ${
                 copiedSecondary ? "ring-2 ring-green-500 bg-green-50" : ""
               }`}
               title="Clique para copiar">
@@ -222,7 +222,7 @@ function CardContent({ title, content, logo, dualFormat }: CardContentProps) {
         )}
         <code
           onClick={() => handleCopy(content)}
-          className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-x-auto break-all transition-all duration-300 cursor-pointer hover:bg-gray-300 ${
+          className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 cursor-pointer hover:bg-gray-300 ${
             copied ? "ring-2 ring-green-500 bg-green-50" : ""
           }`}
           title="Clique para copiar">
