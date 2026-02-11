@@ -124,6 +124,75 @@ export default function Home() {
     const input = coordData ? coordData.toString().trim() : "";
     setInputValue(input);
     await processCoordinates(input);
+
+    // Atualiza a URL usando a rota /c/coordenada
+    if (input && typeof window !== "undefined") {
+      window.history.pushState({}, "", `/c/${encodeURIComponent(input)}`);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!coordinates) return;
+
+    // Determina o formato decimal para a URL
+    const isDmsFormat = coordinates.includes("°");
+    const decimalCoords = isDmsFormat
+      ? convertCoordinates(coordinates.replace(" ", ""))
+      : coordinates.replace(" ", "");
+
+    // Cria a URL de compartilhamento com ?c=
+    const shareUrl = `${window.location.origin}/?c=${encodeURIComponent(decimalCoords)}`;
+
+    // Verifica se a Web Share API está disponível
+    // Nota: Precisa ser HTTPS (ou localhost) e não está disponível em todos os navegadores desktop
+    if (navigator.share && navigator.canShare) {
+      const shareData = {
+        title: "Coordenadas",
+        text: `Coordenadas: ${coordinates}`,
+        url: shareUrl,
+      };
+
+      // Verifica se pode compartilhar esses dados
+      if (navigator.canShare(shareData)) {
+        try {
+          await navigator.share(shareData);
+          return; // Compartilhou com sucesso
+        } catch (error) {
+          // Usuário cancelou ou erro ao compartilhar
+          if ((error as Error).name === "AbortError") {
+            return; // Usuário cancelou, não faz nada
+          }
+          console.error("Erro ao compartilhar:", error);
+        }
+      }
+    }
+
+    // Fallback: copia a URL para a área de transferência
+    copyToClipboard(shareUrl);
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        alert("Link copiado para a área de transferência!");
+      } else {
+        // Fallback para navegadores antigos
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        alert("Link copiado para a área de transferência!");
+      }
+    } catch (err) {
+      console.error("Erro ao copiar:", err);
+      alert("Não foi possível copiar o link.");
+    }
   };
 
   // OTIMIZAÇÃO: A lógica de renderização foi movida para fora do JSX.
@@ -272,6 +341,33 @@ export default function Home() {
       {/* Skeleton loading ou cards com animação */}
       {isLoading && renderSkeletons()}
       {!isLoading && renderCards()}
+
+      {/* Botão de Compartilhar */}
+      {!isLoading && coordinates && (
+        <div className="flex justify-center w-full max-w-3xl mt-6 px-6">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            Compartilhar
+          </button>
+        </div>
+      )}
     </main>
   );
 }

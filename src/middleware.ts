@@ -4,17 +4,11 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Verifica se é o padrão /coord/...
+  // Se é /coord/..., redireciona para /c/...
   if (pathname.startsWith("/coord/")) {
-    // Extrai as coordenadas após "/coord/"
-    const coords = decodeURIComponent(pathname.slice(7)); // Remove "/coord/"
-
-    // Cria URL com query string
+    const coords = pathname.slice(7); // Remove "/coord/"
     const url = new URL(request.nextUrl.origin);
-    url.pathname = "/";
-    url.search = `?coord=${encodeURIComponent(coords)}`;
-
-    // Faz um redirect para que a página leia o query param corretamente
+    url.pathname = `/c/${coords}`;
     return NextResponse.redirect(url);
   }
 
@@ -30,6 +24,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|static).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
