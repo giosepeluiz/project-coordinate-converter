@@ -2,7 +2,6 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 /**
@@ -23,7 +22,7 @@ export default function CoordPage() {
           previousCoord = decodedCoord;
           decodedCoord = decodeURIComponent(decodedCoord);
         }
-      } catch (e) {
+      } catch {
         // Se falhar na decodificação, usa o valor original
         decodedCoord = coord;
       }
