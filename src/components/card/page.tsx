@@ -1,7 +1,7 @@
 // src/components/card/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { convertCoordinates } from "@/app/function/localizationConvert";
 
@@ -15,6 +15,7 @@ export type CardProps = {
 type CardContentProps = {
   title: string;
   content: string;
+  actionUrl?: string;
   logo: string | null;
   dualFormat?: boolean;
 };
@@ -62,7 +63,13 @@ const cardConfig = {
   },
 };
 
-function CardContent({ title, content, logo, dualFormat }: CardContentProps) {
+function CardContent({
+  title,
+  content,
+  actionUrl,
+  logo,
+  dualFormat,
+}: CardContentProps) {
   const [copied, setCopied] = useState(false);
   const [copiedSecondary, setCopiedSecondary] = useState(false);
 
@@ -256,7 +263,7 @@ function CardContent({ title, content, logo, dualFormat }: CardContentProps) {
         </button>
         {title !== "Coordenada Identificada" && (
           <a
-            href={content}
+            href={actionUrl || content}
             target="_blank"
             rel="noopener noreferrer"
             className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors duration-200 flex-shrink-0"
@@ -283,19 +290,38 @@ function CardContent({ title, content, logo, dualFormat }: CardContentProps) {
 }
 
 export default function Card({ type, coordinates }: CardProps) {
+  const [isMobile, setIsMobile] = useState(false);
   const config = cardConfig[type];
+
+  // Verifica se é mobile (após montar para evitar erro de hydration)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ) || window.innerWidth <= 768,
+      );
+    }
+  }, []);
 
   // Se o tipo de card não existir na configuração, não renderiza nada.
   if (!config) {
     return null;
   }
 
-  const content = config.getContent(coordinates);
+  let content = config.getContent(coordinates);
+  let actionUrl = content;
+
+  // Aplica o deep link (waze://) no mobile e tablet apenas na actionUrl
+  if (type === "waze" && isMobile) {
+    actionUrl = `waze://?ll=${coordinates}&navigate=yes`;
+  }
 
   return (
     <CardContent
       title={config.title}
       content={content}
+      actionUrl={actionUrl}
       logo={config.logo}
       dualFormat={config.dualFormat}
     />

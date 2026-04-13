@@ -261,22 +261,30 @@ export default function Home() {
     ];
 
     return (
-      <>
-        {cards.map((card, index) => (
-          <div
-            key={card.type}
-            className={`w-full flex justify-center transition-all duration-500 ${
-              showCards
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-            style={{
-              transitionDelay: showCards ? `${index * 100}ms` : "0ms",
-            }}>
-            <Card coordinates={card.coords} type={card.type} />
-          </div>
-        ))}
-      </>
+      <div className="flex flex-col w-full items-center">
+        {cards.map((card, index) => {
+          let orderClass = "";
+          if (card.type === "localization") orderClass = "order-4 md:order-1";
+          if (card.type === "waze") orderClass = "order-1 md:order-2";
+          if (card.type === "googlemaps") orderClass = "order-2 md:order-3";
+          if (card.type === "applemaps") orderClass = "order-3 md:order-4";
+
+          return (
+            <div
+              key={card.type}
+              className={`w-full flex justify-center transition-all duration-500 ${orderClass} ${
+                showCards
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }`}
+              style={{
+                transitionDelay: showCards ? `${index * 100}ms` : "0ms",
+              }}>
+              <Card coordinates={card.coords} type={card.type} />
+            </div>
+          );
+        })}
+      </div>
     );
   };
 
@@ -300,7 +308,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center p-6 md:p-24 overflow-hidden perspective">
+    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center p-6 pb-24 md:p-24 overflow-hidden perspective">
       {/* Background animado do Google Maps de Lisboa com parallax 3D */}
       <div
         className="absolute inset-0 -z-10 opacity-30"
@@ -332,7 +340,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center w-full max-w-3xl p-6 bg-white rounded-lg shadow-md relative z-10">
+      <div
+        className={`${coordinates ? "hidden md:flex" : "flex"} flex-col items-center justify-center w-full max-w-3xl p-6 bg-white rounded-lg shadow-md relative z-10`}>
         <h1 className="p-7 text-2xl md:text-3xl font-bold text-[#0F9D58] text-center">
           Conversor de Coordenadas
         </h1>
@@ -408,12 +417,12 @@ export default function Home() {
       {isLoading && renderSkeletons()}
       {!isLoading && renderCards()}
 
-      {/* Botões de Gerar QRCode e Compartilhar */}
+      {/* Botões de Gerar QRCode, Compartilhar e Nova Conversão */}
       {!isLoading && coordinates && (
-        <div className="flex justify-center gap-4 w-full max-w-3xl mt-6 px-6">
+        <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 w-full max-w-3xl mt-6 px-6">
           <button
             onClick={handleGenerateQRCode}
-            className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            className="flex flex-1 sm:flex-none justify-center items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -433,7 +442,7 @@ export default function Home() {
           </button>
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            className="flex flex-1 sm:flex-none justify-center items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -452,8 +461,29 @@ export default function Home() {
             </svg>
             Compartilhar
           </button>
+          <button
+            onClick={handleClearInput}
+            className="flex flex-1 sm:flex-none justify-center items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            Nova Conversão
+          </button>
         </div>
       )}
+
+      {/* Spacer invisível para garantir rolagem em telas muito pequenas (mobile) sem o footer encobrir */}
+      {!isLoading && coordinates && <div className="h-20 w-full block md:hidden"></div>}
 
       {/* Modal do QRCode */}
       {showQRModal && (
@@ -483,6 +513,23 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="absolute bottom-0 left-0 w-full bg-white py-3 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 flex flex-col items-center justify-center text-center gap-1">
+        <p className="text-gray-700 md:text-sm text-xs font-medium">
+          Desenvolvido por{" "}
+          <a
+            href="https://github.com/giosepeluiz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#0F9D58] hover:text-green-700 hover:underline underline-offset-2 transition-all duration-300">
+            Giosepe Luiz
+          </a>
+        </p>
+        <p className="text-[10px] text-gray-500 font-medium">
+          Sua privacidade garantida: nenhum dado pessoal é armazenado.
+        </p>
+      </footer>
     </main>
   );
 }
