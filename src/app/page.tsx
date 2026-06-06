@@ -24,7 +24,7 @@ export default function Home() {
 
   const showToast = (message: string) => {
     setToastMessage(message);
-    setTimeout(() => setToastMessage(""), 10000);
+    setTimeout(() => setToastMessage(""), 7500);
   };
 
   const handleCoordinatesFromUrl = (coords: string) => {
@@ -315,7 +315,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative flex min-h-[100dvh] flex-col items-center justify-start md:justify-center pt-8 p-6 pb-28 md:p-24 overflow-x-hidden overflow-y-auto perspective w-full">
+    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center pt-4 px-4 pb-28 md:p-24 overflow-x-hidden overflow-y-auto perspective w-full">
       {/* Background animado do Google Maps de Lisboa com parallax 3D */}
       <div
         className="fixed inset-0 -z-10 opacity-30 pointer-events-none"
@@ -348,17 +348,22 @@ export default function Home() {
       </div>
 
       <div
-        className={`${coordinates ? "hidden md:flex" : "flex"} flex-col items-center justify-center w-full max-w-3xl p-6 bg-white rounded-lg shadow-md relative z-10`}>
-        <h1 className="p-7 text-2xl md:text-3xl font-bold text-[#0F9D58] text-center">
-          Conversor de Coordenadas
-        </h1>
+        className={`${coordinates ? "hidden md:flex" : "flex"} flex-col items-center justify-center w-full max-w-3xl p-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg relative z-10`}>
+        <div className="text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#0F9D58]">
+            Conversor de Coordenadas
+          </h1>
+          {!coordinates && !isLoading && (
+            <p className="text-gray-500 text-sm md:text-base mt-5 md:mt-6 max-w-xs md:max-w-lg mx-auto leading-relaxed">
+              Converta coordenadas entre formatos decimais e DMS, ou cole uma URL do Google Maps.
+            </p>
+          )}
+        </div>
 
         <form
-          className="flex flex-col sm:flex-row w-full justify-between items-center p-4 sm:p-7 gap-4"
+          className="flex flex-col sm:flex-row w-full justify-between items-center p-2 sm:p-7 gap-3 sm:gap-4 mt-4 md:mt-6"
           onSubmit={handleSubmit}>
-          <label htmlFor="coord" className="font-semibold text-gray-700">
-            Coordenadas:
-          </label>
+          
           <input
             type="text"
             id="coord"
@@ -367,7 +372,7 @@ export default function Home() {
             onChange={(e) => setInputValue(e.target.value)}
             onClick={(e) => (e.target as HTMLInputElement).select()}
             placeholder="Ex: 40.7128,-74.0060 ou URL de mapa"
-            className="border border-gray-300 rounded-md w-full sm:w-2/3 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="border border-gray-300 rounded-md w-full sm:flex-1 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             required
           />
           <div className="flex gap-2 w-full sm:w-auto">
@@ -547,7 +552,7 @@ export default function Home() {
         </div>
       )}
 
-      {toastMessage && (<div className="fixed bottom-24 right-6 z-50 bg-green-600/80 backdrop-blur-sm text-white px-6 py-3 rounded-lg shadow-lg shadow-black/10 font-semibold text-sm pointer-events-none animate-[tooltipSlide_7.5s_ease-in-out_forwards]">{toastMessage}</div>)}
+      {toastMessage && (<div className="fixed bottom-24 right-6 z-50 bg-green-600/80 backdrop-blur-sm text-white px-6 py-3 rounded-lg shadow-lg shadow-black/10 font-semibold text-sm pointer-events-none animate-toast-slide">{toastMessage}</div>)}
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 w-full bg-white py-3 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 flex flex-col items-center justify-center text-center gap-1">

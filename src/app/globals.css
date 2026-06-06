@@ -36,3 +36,34 @@
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
 }
+
+@keyframes toast-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(150%);
+  }
+  5% {
+    opacity: 1;
+    transform: translateX(-15px);
+  }
+  8% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  92% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  95% {
+    opacity: 1;
+    transform: translateX(-15px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(150%);
+  }
+}
+
+.animate-toast-slide {
+  animation: toast-slide 7.5s ease-in-out forwards;
+}
