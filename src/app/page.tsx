@@ -264,7 +264,8 @@ export default function Home() {
       <div className="flex flex-col w-full items-center">
         {cards.map((card, index) => {
           let orderClass = "";
-          if (card.type === "localization") orderClass = "order-4 md:order-1";
+          if (card.type === "localization")
+            orderClass = "hidden md:flex order-4 md:order-1";
           if (card.type === "waze") orderClass = "order-1 md:order-2";
           if (card.type === "googlemaps") orderClass = "order-2 md:order-3";
           if (card.type === "applemaps") orderClass = "order-3 md:order-4";
@@ -308,10 +309,10 @@ export default function Home() {
   };
 
   return (
-    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center p-6 pb-24 md:p-24 overflow-hidden perspective">
+    <main className="relative flex min-h-[100dvh] flex-col items-center justify-start md:justify-center pt-8 p-6 pb-28 md:p-24 overflow-x-hidden overflow-y-auto perspective w-full">
       {/* Background animado do Google Maps de Lisboa com parallax 3D */}
       <div
-        className="absolute inset-0 -z-10 opacity-30"
+        className="fixed inset-0 -z-10 opacity-30 pointer-events-none"
         style={{ perspective: "1000px" }}>
         <div
           className="absolute inset-0 animate-slow-pan will-change-transform"
@@ -421,6 +422,30 @@ export default function Home() {
       {!isLoading && coordinates && (
         <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 w-full max-w-3xl mt-6 px-6">
           <button
+            onClick={() => {
+              const mapAppsCoords = coordinates.includes("°")
+                ? convertCoordinates(coordinates.replace(" ", ""))
+                : coordinates.replace(" ", "");
+              copyToClipboard(mapAppsCoords);
+            }}
+            className="flex md:hidden flex-1 sm:flex-none justify-center items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            Copiar Coordenada
+          </button>
+          <button
             onClick={handleGenerateQRCode}
             className="flex flex-1 sm:flex-none justify-center items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
             <svg
@@ -483,7 +508,9 @@ export default function Home() {
       )}
 
       {/* Spacer invisível para garantir rolagem em telas muito pequenas (mobile) sem o footer encobrir */}
-      {!isLoading && coordinates && <div className="h-20 w-full block md:hidden"></div>}
+      {!isLoading && coordinates && (
+        <div className="h-20 w-full block md:hidden"></div>
+      )}
 
       {/* Modal do QRCode */}
       {showQRModal && (
@@ -515,7 +542,7 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="absolute bottom-0 left-0 w-full bg-white py-3 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 flex flex-col items-center justify-center text-center gap-1">
+      <footer className="fixed bottom-0 left-0 w-full bg-white py-3 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 flex flex-col items-center justify-center text-center gap-1">
         <p className="text-gray-700 md:text-sm text-xs font-medium">
           Desenvolvido por{" "}
           <a

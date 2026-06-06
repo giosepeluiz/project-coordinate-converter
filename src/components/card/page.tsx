@@ -217,7 +217,7 @@ function CardContent({
   return (
     <div className="flex flex-col items-center mt-5 justify-center w-full max-w-3xl p-6 bg-white rounded-lg shadow-md">
       {!logo && <span className="text-sky-700 font-bold mb-3">{title}:</span>}
-      <div className="flex items-center gap-2 w-full">
+      <div className="flex items-center justify-center gap-4 md:gap-2 w-full">
         {logo && (
           <Image
             src={logo}
@@ -229,7 +229,7 @@ function CardContent({
         )}
         <code
           onClick={() => handleCopy(content)}
-          className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 cursor-pointer hover:bg-gray-300 ${
+          className={`p-3 bg-gray-200 text-gray-600 flex-1 text-center my-1 overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 cursor-pointer hover:bg-gray-300 hidden md:block ${
             copied ? "ring-2 ring-green-500 bg-green-50" : ""
           }`}
           title="Clique para copiar">
@@ -237,7 +237,7 @@ function CardContent({
         </code>
         <button
           onClick={() => handleCopy(content)}
-          className="p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-200 flex-shrink-0"
+          className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-200"
           title="Copiar">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -266,8 +266,11 @@ function CardContent({
             href={actionUrl || content}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors duration-200 flex-shrink-0"
+            className="flex-1 md:flex-none md:w-11 md:h-11 p-3 md:p-0 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors duration-200"
             title="Abrir link">
+            <span className="md:hidden font-bold text-sm uppercase whitespace-nowrap">
+              Abrir {title}
+            </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
