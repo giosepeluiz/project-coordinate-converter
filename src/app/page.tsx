@@ -20,6 +20,12 @@ export default function Home() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(""), 10000);
+  };
 
   const handleCoordinatesFromUrl = (coords: string) => {
     setInputValue(coords);
@@ -216,7 +222,7 @@ export default function Home() {
     try {
       if (navigator?.clipboard?.writeText) {
         await navigator.clipboard.writeText(text);
-        alert("Link copiado para a área de transferência!");
+        showToast("COPIADO!");
       } else {
         // Fallback para navegadores antigos
         const textArea = document.createElement("textarea");
@@ -228,11 +234,11 @@ export default function Home() {
         textArea.select();
         document.execCommand("copy");
         document.body.removeChild(textArea);
-        alert("Link copiado para a área de transferência!");
+        showToast("COPIADO!");
       }
     } catch (err) {
       console.error("Erro ao copiar:", err);
-      alert("Não foi possível copiar o link.");
+      showToast("Não foi possível copiar.");
     }
   };
 
@@ -540,6 +546,8 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {toastMessage && (<div className="fixed bottom-24 right-6 z-50 bg-green-600/80 backdrop-blur-sm text-white px-6 py-3 rounded-lg shadow-lg shadow-black/10 font-semibold text-sm pointer-events-none animate-[tooltipSlide_7.5s_ease-in-out_forwards]">{toastMessage}</div>)}
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 w-full bg-white py-3 px-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 flex flex-col items-center justify-center text-center gap-1">

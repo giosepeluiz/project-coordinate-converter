@@ -1,4 +1,3 @@
-// tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -9,20 +8,21 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // NOVO: Definindo a animação e os keyframes
       animation: {
         "fade-in-up": "fadeInUp 0.5s ease-out forwards",
       },
       keyframes: {
         fadeInUp: {
-          "0%": {
-            opacity: "0",
-            transform: "translateY(20px)",
-          },
-          "100%": {
-            opacity: "1",
-            transform: "translateY(0)",
-          },
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        tooltipSlide: {
+          "0%": { opacity: "0", transform: "translateX(150%)" },
+          "5%": { opacity: "1", transform: "translateX(-15px)" },
+          "8%": { opacity: "1", transform: "translateX(0)" },
+          "92%": { opacity: "1", transform: "translateX(0)" },
+          "95%": { opacity: "1", transform: "translateX(-15px)" },
+          "100%": { opacity: "0", transform: "translateX(150%)" },
         },
       },
     },
