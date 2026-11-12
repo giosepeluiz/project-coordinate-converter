@@ -66,6 +66,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Tudo, exceto a API, arquivos do Next e arquivos estáticos conhecidos.
-    "/((?!api/|_next/|assets/|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest).*)",
+    "/((?!api/|_next/|assets/|\\.well-known/|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest).*)",
   ],
 };

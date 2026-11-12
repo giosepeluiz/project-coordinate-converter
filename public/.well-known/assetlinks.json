@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "de.arqueirover.coordenadas",
+      "sha256_cert_fingerprints": [
+        "62:EA:F8:32:78:B9:BF:AF:89:1F:5D:CC:5E:7E:54:D8:FC:E3:A0:8F:A6:18:38:9C:0A:EA:09:39:F9:F3:95:79"
+      ]
+    }
+  }
+]
