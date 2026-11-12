@@ -12,13 +12,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 
-**[🌐 Abrir o site](https://coordenadas.arqueirover.de)** · **[📖 Como usar](#-como-funciona-passo-a-passo)** · **[🕰️ Versões](#️-histórico-de-versões)** · **[🤝 Contribuir](#-código-aberto-contribua)**
+**[🌐 Abrir o site](https://coordenadas.arqueirover.de)** · **[📱 App Android](#-app-android)** · **[📖 Como usar](#-como-funciona-passo-a-passo)** · **[🕰️ Versões](#️-histórico-de-versões)** · **[🤝 Contribuir](#-código-aberto-contribua)**
 
 <img src="docs/screenshots/02-resultado.png" width="860" alt="Resultado de uma conversão no Conversor de Coordenadas">
 
 </div>
 
-> 🇬🇧 **English summary:** *Conversor de Coordenadas* is a free web app that converts geographic coordinates between decimal degrees (DD) and degrees-minutes-seconds (DMS), and opens the location in Waze, Google Maps or Apple Maps with one tap. Paste plain coordinates or any Google Maps, Waze or Apple Maps link (short links included), either in the input or right after the site's address. On phones, the buttons open the navigation apps directly. Light, dark or system theme. No sign-up, no tracking.
+> 🇬🇧 **English summary:** *Conversor de Coordenadas* is a free web app that converts geographic coordinates between decimal degrees (DD) and degrees-minutes-seconds (DMS), and opens the location in Waze, Google Maps or Apple Maps with one tap. Paste plain coordinates or any Google Maps, Waze or Apple Maps link (short links included), either in the input or right after the site's address. On phones, the buttons open the navigation apps directly. Light, dark or system theme. No sign-up, no tracking. An Android app (APK) with the same features is available in the [Releases](https://github.com/giosepeluiz/project-coordinate-converter/releases/latest) page.
 
 ---
 
@@ -53,6 +53,39 @@ No celular, a tela fica bem enxuta: é só tocar no app de destino, e ele abre d
 É só acessar **[coordenadas.arqueirover.de](https://coordenadas.arqueirover.de)**. Funciona no computador e no celular, em qualquer navegador moderno, sem instalar nada.
 
 > 💡 **Dica:** no celular, use **Compartilhar → Adicionar à tela de início** para ter um atalho direto para o conversor.
+
+## 📱 App Android
+
+Além do site, existe um **app para Android** com tudo o que o site faz, mais o que só faz sentido no celular. Ele não está na Play Store: o instalador (`.apk`) fica na página de **[Releases](https://github.com/giosepeluiz/project-coordinate-converter/releases/latest)**.
+
+**[⬇️ Baixar a última versão](https://github.com/giosepeluiz/project-coordinate-converter/releases/latest)**
+
+| | |
+|---|---|
+| 📤 **Recebe localizações de outros apps** | Em qualquer app de mapas, toque em **Compartilhar** e escolha o Conversor: a conversão aparece na hora |
+| 🔗 **Abre links do site** | Links para `coordenadas.arqueirover.de` (no navegador, em planilhas, PDF…) podem abrir direto no app |
+| 🧭 **Escolha os seus serviços** | Waze, Google Maps e TomTom vêm ativos; HERE WeGo, Yandex Maps, OpenStreetMap, Bing Maps e Organic Maps são opcionais. O mínimo é um serviço |
+| ⚡ **Serviço padrão** | Ao receber uma localização, o app pode abrir direto no serviço que você escolheu, sem perguntar |
+| 🌍 **15 idiomas** | Começa no idioma do telefone: português (BR e PT), inglês (US e UK), espanhol, alemão, francês, italiano, holandês, polonês, russo, turco, ucraniano, japonês e chinês |
+| ⚙️ **Configurações** | Tema (sistema, claro ou escuro), idioma, serviços, serviço padrão e atalho para *Abrir por padrão* |
+| 👋 **Primeira abertura guiada** | Na primeira vez, o app pergunta idioma, tema e serviços |
+| 🔎 **Lê mais links** | Entende links do Google Maps (inclusive curtos), Waze, Apple Maps, OpenStreetMap, Bing, HERE, Yandex, Organic Maps, TomTom, `geo:` e o próprio link do site |
+| 🔒 **Privado** | Sem cadastro e sem rastreamento. Só as suas preferências ficam no aparelho |
+
+### Como instalar
+
+1. Abra a página de **[Releases](https://github.com/giosepeluiz/project-coordinate-converter/releases/latest)** no celular e baixe o arquivo `Conversor-de-Coordenadas-….apk`.
+2. Abra o arquivo. Se o Android pedir, permita a instalação por esse navegador ou gerenciador de arquivos (*Instalar apps desconhecidos*).
+3. Abra o app e faça a primeira configuração.
+
+Requer **Android 10** ou mais novo. Para atualizar, basta instalar o novo `.apk` por cima: as configurações são mantidas.
+
+### Abrir links do Google Maps e do Waze com o Conversor
+
+O Android só deixa um app abrir links de um site automaticamente se o site o autorizar. Para o link do **próprio conversor** isso já funciona. Para os links do Google Maps e do Waze, a liberação é manual, em **Configurações do Android → Apps → Conversor de Coordenadas → Abrir por padrão**. Se os apps oficiais já estiverem como padrão desses links, o Android continua abrindo neles. O caminho que sempre funciona é **Compartilhar → Conversor de Coordenadas**.
+
+> ℹ️ O Apple Maps não tem botão no app Android (ele não existe nesse sistema), mas os links dele continuam sendo lidos.
+> ⚠️ Links curtos do Google Maps que só trazem o nome do lugar dependem de acesso à internet e, às vezes, a coordenada encontrada é aproximada.
 
 ## 📖 Como funciona, passo a passo
 
@@ -151,7 +184,7 @@ No canto do rodapé ficam três botões: 🖥️ **Sistema** (segue o tema do ce
 ## 🔒 Privacidade
 
 - **Sem cadastro, sem login e sem cookies de rastreamento.**
-- A única coisa guardada é a **escolha do tema**, e ela fica no **seu** navegador (`localStorage`), não num servidor.
+- A única coisa guardada é a **escolha do tema**, e ela fica no **seu** navegador (`localStorage`), não num servidor. No app Android, ficam no aparelho apenas as preferências (tema, idioma, serviços).
 - Coordenadas digitadas são convertidas **no próprio navegador**. Só links curtos ou links sem coordenada passam pelo servidor, e só para descobrir a localização.
 - Quando o link traz só o nome do lugar, esse nome é consultado no serviço de geocodificação (Nominatim ou Google), sem nenhum dado seu junto.
 - Nada do que você cola é salvo.
@@ -173,6 +206,14 @@ link só com o nome do lugar       →  o servidor busca o lugar pelo nome (geoc
 **Geocodificação:** por padrão usa o **Nominatim** (OpenStreetMap), que é gratuito. Se você configurar uma chave da **API do Google**, ela passa a ser usada, com resultados mais precisos.
 
 ## 🕰️ Histórico de versões
+
+### 🤖 App Android: de 1.0 a 1.2.1
+**Novembro de 2026**
+
+- **1.0:** primeira versão do app. Tudo o que o site faz, mais receber localização por **Compartilhar** (Google Maps, Waze, Apple Maps) e oferecer-se para abrir links de `coordenadas.arqueirover.de`.
+- **1.1:** o **TomTom** entrou no lugar do Apple Maps (que não existe no Android) e a tela inicial ganhou título, explicação resumida e formulário centralizado.
+- **1.2:** página de **Configurações** (tema, idioma, serviços), **15 idiomas** a partir do idioma do telefone, escolha dos **serviços** exibidos (mínimo 1) com cinco opcionais, **serviço padrão** que abre direto, **primeira abertura guiada**, leitura de links de HERE, Yandex, Organic Maps, TomTom e do próprio site, visual azul de mapa e novo ícone.
+- **1.2.1:** links curtos do Google Maps passam a ser resolvidos com mais chance de acerto (cookie de consentimento, mais pontos de leitura e busca por endereço como reserva) e as telas ficam **centralizadas na vertical**.
 
 ### 🚀 Versão 3.0: "Cara nova e entende qualquer link"
 **Novembro de 2026**
