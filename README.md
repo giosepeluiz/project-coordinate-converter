@@ -1,92 +1,69 @@
 # Conversor de Coordenadas
 
-Este projeto é um conversor de coordenadas geográficas entre os formatos Graus Decimais (DD) e Graus, Minutos e Segundos (DMS), além de gerar links para navegação em aplicativos de mapas como Waze, Google Maps e Apple Maps.
+Converte coordenadas entre **Graus Decimais (DD)** e **Graus, Minutos e Segundos (DMS)** e gera links prontos para **Waze**, **Google Maps** e **Apple Maps**. Também lê links desses apps, inclusive links curtos.
 
-## Funcionalidades
+## O que aceita
 
-- **Conversão automática** entre os formatos DD e DMS.
-- **Geração de links** para navegação em Waze, Google Maps e Apple Maps usando as coordenadas fornecidas.
-- Interface simples e responsiva, desenvolvida com Next.js e Tailwind CSS.
+| Entrada | Exemplo |
+| --- | --- |
+| Decimal | `38.5349409, -9.006521` · `38.5349 -9.0065` · `38,5349; -9,0065` |
+| Decimal com hemisfério | `38.5349 N, 9.0065 W` · `38.53°N 9.00°O` |
+| DMS | `38°32'05.8"N 9°00'23.5"W` · `38° 32′ 5.8″ N, 9° 0′ 23.5″ W` |
+| DDM | `38°32.097'N 9°0.391'W` |
+| Google Maps | `?q=` · `@lat,lng` · `!3d…!4d…` · `/place/` · `/search/` · `/dir/` · `maps.app.goo.gl/…` |
+| Waze | `waze.com/ul?ll=` · `live-map/directions?to=ll.` · `waze.com/ul/h<geohash>` · `waze://` |
+| Apple Maps | `?ll=` · `?q=` · `?daddr=` · `/place?coordinate=` · `maps.apple/p/…` · `maps://` |
+| Outros | `geo:` · OpenStreetMap · Bing Maps |
 
-## Como funciona
+Hemisférios em inglês ou português: `N`, `S`, `E`/`L`, `W`/`O`.
 
-1. O usuário insere uma coordenada no formato DD (ex: `40.7128,-74.0060`) ou DMS (ex: `40° 42' 46.08"N, 74° 0' 21.60"W`).
-2. O sistema detecta automaticamente o formato e realiza a conversão para o outro formato.
-3. São exibidos cards com:
-   - A coordenada convertida.
-   - Links prontos para abrir a localização nos principais aplicativos de mapas.
+## Colar na URL do site
 
-## Estrutura do Projeto
+Qualquer coordenada ou link de mapa pode ser colado **depois do domínio**, e o site redireciona para a forma limpa `/?c=lat,lng`:
+
+```
+https://coordenadas.arqueirover.de/https://maps.google.com/maps?q=38.5349409%2C-9.006521&z=17
+https://coordenadas.arqueirover.de/https://maps.app.goo.gl/B6kwLzPfcJHKHPeh6
+https://coordenadas.arqueirover.de/https://waze.com/ul?ll=38.5349,-9.0065
+https://coordenadas.arqueirover.de/38.5349,-9.0065
+```
+
+Links curtos e links de lugares sem coordenadas (ex.: `/maps/place/Torre+de+Belém`) são resolvidos no servidor: primeiro seguindo os redirecionamentos e, se necessário, geocodificando o nome do lugar.
+
+## Estrutura
 
 ```
 src/
+  proxy.ts                 # Redireciona /<coordenada ou URL> → /?c=lat,lng
   app/
-    function/
-      localizationConvert.ts      # Funções de conversão de coordenadas
-    layout.tsx                    # Layout global da aplicação
-    page.tsx                      # Página principal e lógica de UI
-    globals.css                   # Estilos globais (Tailwind)
+    page.tsx               # Página (Server Component) — lê ?c= e renderiza já pronta
+    layout.tsx             # Layout, fontes e metadados (pt-BR, Open Graph)
+    api/resolve/route.ts   # GET /api/resolve?u=… para links digitados no campo
   components/
-    card/
-      page.tsx                    # Componente de exibição dos cards de resultado
+    converter.tsx          # Formulário e estado da tela
+    results.tsx            # Cards de conversão e botões dos apps
+    qr-dialog.tsx          # QR Code (carregado sob demanda) com download
+    map-background.tsx     # Fundo de mapa em SVG local com parallax leve
+  lib/
+    coordinates.ts         # Parsing e formatação (DD, DMS, DDM)
+    map-urls.ts            # Leitura de URLs de mapas e geração de links
+    resolve.ts             # Resolução no servidor (com proteção contra SSRF)
 ```
 
-## Detalhamento dos Arquivos
+## Variáveis de ambiente (opcionais)
 
-### src/app/function/localizationConvert.ts
+| Variável | Uso |
+| --- | --- |
+| `GOOGLE_MAPS_API_KEY` | Geocodifica nomes de lugares com a API do Google (mais precisa). Sem ela, usa o Nominatim (OpenStreetMap). |
+| `NOMINATIM_USER_AGENT` | Identificação enviada ao Nominatim, conforme a política de uso dele. |
+| `NEXT_PUBLIC_SITE_URL` | URL pública usada nos metadados (padrão: `https://coordenadas.arqueirover.de`). |
 
-- Implementa as funções:
-  - `convertCoordinates`: Detecta o formato e converte entre DD e DMS.
-  - Funções auxiliares privadas para conversão:
-    - `dmsToDecimal`: DMS → DD
-    - `decimalToDms`: DD → DMS
+## Scripts
 
-### src/app/page.tsx
-
-- Componente principal da aplicação.
-- Gerencia o estado do input do usuário.
-- Chama as funções de conversão e renderiza os cards de resultado usando o componente `Card`.
-
-### src/components/card/page.tsx
-
-- Define o componente `Card` e o objeto de configuração dos tipos de card.
-- Cada card exibe:
-  - O título (tipo de conversão ou app de mapa).
-  - O conteúdo (coordenada convertida ou link para o app).
-
-### src/app/layout.tsx
-
-- Define o layout global da aplicação, incluindo fontes e estilos globais.
-
-### src/app/globals.css
-
-- Importa o Tailwind CSS para estilização.
-
-## Como rodar o projeto
-
-1. Instale as dependências:
-   ```sh
-   npm install
-   ```
-2. Rode o servidor de desenvolvimento:
-   ```sh
-   npm run dev
-   ```
-3. Acesse [http://localhost:3000](http://localhost:3000) no navegador.
-
-## Exemplos de uso
-
-- **Entrada DD:**  
-  `40.7128,-74.0060`
-- **Entrada DMS:**  
-  `40° 42' 46.08"N, 74° 0' 21.60"W`
-
-O sistema irá converter e exibir ambos os formatos, além dos links para navegação.
-
-## Licença
-
-Este projeto é livre para uso educacional e pessoal.
-
----
-
-Desenvolvido por Giosepe Luiz
+```bash
+npm run dev        # desenvolvimento
+npm run build      # build de produção
+npm test           # testes (Vitest)
+npm run lint       # ESLint
+npm run typecheck  # TypeScript
+```
