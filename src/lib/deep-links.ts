@@ -7,7 +7,7 @@
  *   app ou, se não estiver instalado, o link web).
  * - iOS: esquema do app (waze://, comgooglemaps://, maps://…).
  * Como esquemas próprios não avisam se o app existe, ao tocar armamos um
- * fallback: se a página continuar visível após 1,5 s, abre o link web.
+ * fallback: se a página continuar visível após 5 s, abre o link web.
  * - Desktop (ou serviço sem app): null, e o botão usa o link web normal.
  *
  * O link web normal continua no botão de copiar.
@@ -63,7 +63,7 @@ export function needsFallback(id: ServiceId, platform: Platform): boolean {
   return false;
 }
 
-const FALLBACK_MS = 1500;
+const FALLBACK_MS = 5000;
 
 /**
  * Chamado no toque do botão "Abrir" (o `href` já é o link do app):
