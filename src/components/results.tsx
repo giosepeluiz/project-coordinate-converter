@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { formatDecimal, formatDms, type LatLng } from "@/lib/coordinates";
-import { openInApp } from "@/lib/deep-links";
+import { appDeepLink, armWebFallback, type Platform } from "@/lib/deep-links";
 import { SERVICES } from "@/lib/services";
 import { CopyIcon, EditIcon, ExternalIcon, PinIcon, QrIcon, ResetIcon, ShareIcon } from "./icons";
 import { useSettings } from "./settings-provider";
+import { usePlatform } from "./use-platform";
 
 const card =
   "rounded-2xl bg-white/90 shadow-md ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/85 dark:ring-white/10";
@@ -21,10 +22,13 @@ type Props = {
   onShare: () => void;
   onReset: () => void;
   onEdit: () => void;
+  /** Plataforma detectada no servidor (User-Agent). */
+  platform: Platform;
 };
 
-export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit }: Props) {
+export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit, platform: serverPlatform }: Props) {
   const { t, settings } = useSettings();
+  const platform = usePlatform(serverPlatform);
   const decimal = formatDecimal(coords);
   const dms = formatDms(coords);
   // Só os serviços ativos nas configurações, na ordem fixa.
@@ -86,26 +90,27 @@ export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit }: Prop
       {/* Apps de navegação */}
       <ul className="space-y-3 md:space-y-4" aria-label={t("openIn")}>
         {services.map((s) => {
-          const href = s.web(coords);
+          const web = s.web(coords);
+          // No celular, o botão "Abrir" chama o app direto (ex.: waze://); o link web fica no copiar.
+          const app = appDeepLink(s.id, coords, platform);
           return (
             <li key={s.id} className={`${card} flex items-center gap-3 p-3 md:p-4`}>
               <Image src={s.logo} alt="" width={44} height={44} className="size-11 shrink-0 rounded-lg" />
               <span className="hidden min-w-0 flex-1 md:block">
                 <span className="block font-semibold text-gray-900 dark:text-gray-100">{s.name}</span>
-                <span className="block truncate font-mono text-xs text-gray-500 dark:text-gray-400">{href}</span>
+                <span className="block truncate font-mono text-xs text-gray-500 dark:text-gray-400">{web}</span>
               </span>
               <button
                 type="button"
-                onClick={() => onCopy(href, "link")}
+                onClick={() => onCopy(web, "link")}
                 className={iconButton}
                 aria-label={t("copyLinkOf", { app: s.name })}>
                 <CopyIcon />
               </button>
               <a
-                href={href}
-                onClick={(e) => openInApp(e, s.id, coords)}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={app ?? web}
+                onClick={app ? () => armWebFallback(s.id, coords, platform) : undefined}
+                {...(app ? {} : { target: "_blank", rel: "noopener noreferrer" })}
                 aria-label={t("openApp", { app: s.name })}
                 className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-bold uppercase text-white transition-colors hover:bg-emerald-700 md:flex-none md:px-4 md:tracking-wide">
                 {/* Traduções longas quebram em duas linhas em vez de cortar. */}

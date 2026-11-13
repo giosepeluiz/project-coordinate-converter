@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { MessageKey } from "@/i18n/messages";
 import type { AndroidRelease } from "@/lib/android-release";
+import type { Platform } from "@/lib/deep-links";
 import { copyText } from "@/lib/clipboard";
 import { formatDecimal, toParam, type LatLng } from "@/lib/coordinates";
 import { extractUrlFromText, isMapUrl, parseInput, toUrl } from "@/lib/map-urls";
@@ -22,9 +23,11 @@ type Props = {
   initialError: boolean;
   /** Release do app Android; null esconde o botão (ex.: iPhone). */
   androidApp: AndroidRelease | null;
+  /** Plataforma detectada no servidor, para os links de app já virem no HTML. */
+  platform: Platform;
 };
 
-export function Converter({ initialInput, initialCoords, initialError, androidApp }: Props) {
+export function Converter({ initialInput, initialCoords, initialError, androidApp, platform }: Props) {
   const { t } = useSettings();
   const [input, setInput] = useState(initialInput);
   const [coords, setCoords] = useState<LatLng | null>(initialCoords);
@@ -212,6 +215,7 @@ export function Converter({ initialInput, initialCoords, initialError, androidAp
         {coords && !loading && (
           <Results
             coords={coords}
+            platform={platform}
             onCopy={handleCopy}
             onQr={() => setQrOpen(true)}
             onShare={handleShare}

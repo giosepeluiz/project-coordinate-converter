@@ -14,16 +14,25 @@ describe("detectPlatform", () => {
     expect(detectPlatform(IPAD, 5)).toBe("ios");
     expect(detectPlatform(IPAD, 0)).toBe("other");
     expect(detectPlatform(DESKTOP)).toBe("other");
+    expect(detectPlatform(null)).toBe("other");
   });
 });
 
 describe("appDeepLink", () => {
-  it("Android usa intent:// com pacote e fallback web", () => {
-    expect(appDeepLink("waze", c, "android")).toBe(
-      "intent://waze.com/ul?ll=38.534941,-9.006521&navigate=yes#Intent;scheme=https;package=com.waze;" +
-        "S.browser_fallback_url=https%3A%2F%2Fwaze.com%2Ful%3Fll%3D38.534941%2C-9.006521%26navigate%3Dyes;end",
+  it("Android chama o esquema do app direto quando existe (waze://, yandexmaps://)", () => {
+    expect(appDeepLink("waze", c, "android")).toBe("waze://?ll=38.534941,-9.006521&navigate=yes");
+    expect(appDeepLink("yandex", c, "android")).toBe(
+      "yandexmaps://maps.yandex.ru/?pt=-9.006521,38.534941&z=16&l=map",
     );
-    expect(appDeepLink("googlemaps", c, "android")).toContain("package=com.google.android.apps.maps");
+  });
+
+  it("Android usa intent: com pacote e fallback web para apps sem esquema próprio", () => {
+    expect(appDeepLink("googlemaps", c, "android")).toBe(
+      "intent://www.google.com/maps/search/?api=1&query=38.534941,-9.006521#Intent;scheme=https;" +
+        "package=com.google.android.apps.maps;" +
+        "S.browser_fallback_url=https%3A%2F%2Fwww.google.com%2Fmaps%2Fsearch%2F%3Fapi%3D1%26query%3D38.534941%2C-9.006521;end",
+    );
+    expect(appDeepLink("tomtom", c, "android")).toContain("scheme=geo;package=com.tomtom.gplay.navapp");
     expect(appDeepLink("applemaps", c, "android")).toBeNull();
   });
 
@@ -31,15 +40,18 @@ describe("appDeepLink", () => {
     expect(appDeepLink("waze", c, "ios")).toBe("waze://?ll=38.534941,-9.006521&navigate=yes");
     expect(appDeepLink("googlemaps", c, "ios")).toBe("comgooglemaps://?q=38.534941,-9.006521&center=38.534941,-9.006521");
     expect(appDeepLink("applemaps", c, "ios")).toBe("maps://?ll=38.534941,-9.006521&q=38.534941,-9.006521");
+    expect(appDeepLink("osm", c, "ios")).toBeNull();
   });
 
   it("desktop usa o link web", () => {
     expect(appDeepLink("waze", c, "other")).toBeNull();
   });
 
-  it("fallback por tempo só no iOS e não para o Apple Maps", () => {
+  it("fallback por tempo só para esquemas próprios", () => {
     expect(needsFallback("waze", "ios")).toBe(true);
-    expect(needsFallback("applemaps", "ios")).toBe(false);
-    expect(needsFallback("waze", "android")).toBe(false);
+    expect(needsFallback("waze", "android")).toBe(true);
+    expect(needsFallback("googlemaps", "android")).toBe(false); // intent: já traz o fallback
+    expect(needsFallback("applemaps", "ios")).toBe(false); // Mapas vem instalado
+    expect(needsFallback("waze", "other")).toBe(false);
   });
 });

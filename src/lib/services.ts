@@ -23,7 +23,9 @@ export type Service = {
   defaultOn: boolean;
   /** Link web (botão "Abrir" no computador, copiar link e fallback no celular). */
   web: (c: LatLng) => string;
-  /** Android: pacote do app + URI que ele abre (vira intent:// com fallback web). */
+  /** Android: esquema próprio do app (ex.: waze://), chamado direto, com fallback web por tempo. */
+  androidScheme?: (c: LatLng) => string;
+  /** Android, quando o app não tem esquema próprio: pacote + URI (vira intent: com fallback web embutido). */
   android?: { pkg: string; uri: (c: LatLng) => string };
   /** iOS: esquema do app (com fallback web por tempo) — só quando confiável. */
   ios?: (c: LatLng) => string;
@@ -42,7 +44,7 @@ export const SERVICES: Service[] = [
     logo: "/assets/waze.svg",
     defaultOn: true,
     web: (c) => `https://waze.com/ul?ll=${toParam(c)}&navigate=yes`,
-    android: { pkg: "com.waze", uri: (c) => `https://waze.com/ul?ll=${toParam(c)}&navigate=yes` },
+    androidScheme: (c) => `waze://?ll=${toParam(c)}&navigate=yes`,
     ios: (c) => `waze://?ll=${toParam(c)}&navigate=yes`,
   },
   {
@@ -91,7 +93,7 @@ export const SERVICES: Service[] = [
     defaultOn: false,
     // Atenção: o Yandex usa LONGITUDE,LATITUDE.
     web: (c) => `https://yandex.com/maps/?pt=${lng(c)},${lat(c)}&z=16&l=map`,
-    android: { pkg: "ru.yandex.yandexmaps", uri: (c) => `yandexmaps://maps.yandex.ru/?pt=${lng(c)},${lat(c)}&z=16&l=map` },
+    androidScheme: (c) => `yandexmaps://maps.yandex.ru/?pt=${lng(c)},${lat(c)}&z=16&l=map`,
     ios: (c) => `yandexmaps://maps.yandex.ru/?pt=${lng(c)},${lat(c)}&z=16&l=map`,
   },
   {

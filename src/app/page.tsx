@@ -6,6 +6,7 @@ import { translator } from "@/i18n/messages";
 import { getServerLang } from "@/i18n/server";
 import { getAndroidRelease, isIOS } from "@/lib/android-release";
 import { formatDecimal, formatDms, toParam } from "@/lib/coordinates";
+import { detectPlatform } from "@/lib/deep-links";
 import { parseInput } from "@/lib/map-urls";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -49,6 +50,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       initialCoords={coords}
       initialError={!!raw && !coords}
       androidApp={androidApp}
+      platform={detectPlatform(ua)}
     />
   );
 }

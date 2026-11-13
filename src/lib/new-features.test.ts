@@ -85,13 +85,12 @@ describe("links gerados", () => {
     expect(web.organicmaps).toBe("https://omaps.app/38.534941,-9.006521");
   });
 
-  it("intent: para esquemas geo e yandexmaps no Android", () => {
+  it("intent: com esquema geo no Android; Yandex chama o esquema direto", () => {
     expect(androidIntent("geo:1,2?q=1,2", "app.organicmaps", "https://x")).toBe(
       "intent:1,2?q=1,2#Intent;scheme=geo;package=app.organicmaps;S.browser_fallback_url=https%3A%2F%2Fx;end",
     );
-    expect(appDeepLink("yandex", c, "android")).toMatch(
-      /^intent:\/\/maps\.yandex\.ru\/\?pt=-9\.006521,38\.534941.*scheme=yandexmaps;package=ru\.yandex\.yandexmaps;/,
-    );
+    expect(appDeepLink("organicmaps", c, "android")).toContain("scheme=geo;package=app.organicmaps");
+    expect(appDeepLink("yandex", c, "android")).toBe("yandexmaps://maps.yandex.ru/?pt=-9.006521,38.534941&z=16&l=map");
     expect(appDeepLink("osm", c, "android")).toBeNull();
   });
 });
