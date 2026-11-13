@@ -1,14 +1,14 @@
 /**
  * Links que abrem direto o aplicativo instalado no celular.
  *
- * - Android: URLs `intent://` com o pacote do app e `S.browser_fallback_url`.
+ * - Android: URLs `intent:` com o pacote do app e `S.browser_fallback_url`.
  *   O próprio Chrome/WebView abre o app ou, se não estiver instalado, o link web.
- * - iOS: esquemas próprios (waze://, comgooglemaps://, maps://). Como o iOS não
+ * - iOS: esquemas próprios (waze://, comgooglemaps://, maps://…). Como o iOS não
  *   informa se o app existe, quem chama faz o fallback para o link web após um tempo.
- * - Desktop: null (usa o link web normal).
+ * - Desktop (ou serviço sem app): null, e o link web segue normalmente.
  */
-import { toParam, type LatLng } from "./coordinates";
-import { appLink, type MapApp } from "./map-urls";
+import type { LatLng } from "./coordinates";
+import { getService, type ServiceId } from "./services";
 
 export type Platform = "android" | "ios" | "other";
 
@@ -19,43 +19,31 @@ export function detectPlatform(ua: string, maxTouchPoints = 0): Platform {
   return "other";
 }
 
-const ANDROID_PACKAGES: Partial<Record<MapApp, string>> = {
-  waze: "com.waze",
-  googlemaps: "com.google.android.apps.maps",
-};
-
-function androidIntent(web: string, pkg: string): string {
-  const u = new URL(web);
+/**
+ * Monta a URL `intent:` do Chrome para Android trocando o esquema da URI
+ * original: "https://x/y" → "intent://x/y#Intent;scheme=https;…" e
+ * "geo:1,2" → "intent:1,2#Intent;scheme=geo;…".
+ */
+export function androidIntent(uri: string, pkg: string, fallback: string): string {
+  const i = uri.indexOf(":");
+  const scheme = uri.slice(0, i);
+  const rest = uri.slice(i + 1);
   return (
-    `intent://${u.host}${u.pathname}${u.search}` +
-    `#Intent;scheme=${u.protocol.replace(":", "")};package=${pkg};` +
-    `S.browser_fallback_url=${encodeURIComponent(web)};end`
+    `intent:${rest}#Intent;scheme=${scheme};package=${pkg};` +
+    `S.browser_fallback_url=${encodeURIComponent(fallback)};end`
   );
 }
 
-export function appDeepLink(app: MapApp, c: LatLng, platform: Platform): string | null {
-  const p = toParam(c);
-  if (platform === "android") {
-    const pkg = ANDROID_PACKAGES[app];
-    // Apple Maps não existe no Android: fica o link web.
-    return pkg ? androidIntent(appLink(app, c), pkg) : null;
-  }
-  if (platform === "ios") {
-    switch (app) {
-      case "waze":
-        return `waze://?ll=${p}&navigate=yes`;
-      case "googlemaps":
-        return `comgooglemaps://?q=${p}&center=${p}`;
-      case "applemaps":
-        return `maps://?ll=${p}&q=${p}`;
-    }
-  }
+export function appDeepLink(id: ServiceId, c: LatLng, platform: Platform): string | null {
+  const s = getService(id);
+  if (platform === "android" && s.android) return androidIntent(s.android.uri(c), s.android.pkg, s.web(c));
+  if (platform === "ios" && s.ios) return s.ios(c);
   return null;
 }
 
-/** No iOS, o Apple Maps vem instalado: dispensa o fallback por tempo. */
-export const needsFallback = (app: MapApp, platform: Platform) =>
-  platform === "ios" && app !== "applemaps";
+/** Só o iOS precisa de fallback por tempo, e não para apps que já vêm instalados. */
+export const needsFallback = (id: ServiceId, platform: Platform) =>
+  platform === "ios" && !getService(id).iosBuiltIn;
 
 const FALLBACK_MS = 1500;
 
@@ -64,14 +52,14 @@ const FALLBACK_MS = 1500;
  * continuar visível depois de 1,5 s (app não instalado), abre o link web.
  * No desktop não faz nada e o <a href> segue normalmente.
  */
-export function openInApp(e: { preventDefault(): void }, app: MapApp, c: LatLng) {
+export function openInApp(e: { preventDefault(): void }, id: ServiceId, c: LatLng) {
   const platform = detectPlatform(navigator.userAgent, navigator.maxTouchPoints);
-  const deep = appDeepLink(app, c, platform);
+  const deep = appDeepLink(id, c, platform);
   if (!deep) return;
   e.preventDefault();
 
-  if (needsFallback(app, platform)) {
-    const web = appLink(app, c);
+  if (needsFallback(id, platform)) {
+    const web = getService(id).web(c);
     const timer = setTimeout(() => {
       if (document.visibilityState === "visible") window.location.href = web;
     }, FALLBACK_MS);

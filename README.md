@@ -6,7 +6,7 @@
 
 ### Cole uma coordenada ou um link de mapa e abra no Waze, Google Maps ou Apple Maps em um toque.
 
-[![Versão](https://img.shields.io/badge/versão-3.0.0-10b981?style=for-the-badge)](https://coordenadas.arqueirover.de)
+[![Versão](https://img.shields.io/badge/versão-3.1.0-10b981?style=for-the-badge)](https://coordenadas.arqueirover.de)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -35,15 +35,18 @@ No celular, a tela fica bem enxuta: é só tocar no app de destino, e ele abre d
 | | |
 |---|---|
 | 🔄 **Decimal ↔ DMS** | Mostra sempre os dois formatos: `38.691586, -9.215929` e `38°41'29.7"N 9°12'57.3"W` |
-| 🔗 **Lê links de mapas** | Google Maps, Waze e Apple Maps, além de OpenStreetMap, Bing Maps e `geo:` |
+| 🔗 **Lê links de mapas** | Google Maps, Waze, Apple Maps, TomTom, HERE WeGo, Yandex Maps, OpenStreetMap, Bing Maps, Organic Maps, `geo:` e o próprio link do site |
+| 💬 **Texto de compartilhamento** | Cole a mensagem inteira ("Nome do lugar https://maps.app.goo.gl/…"): o link de dentro é encontrado |
 | ✂️ **Links curtos também** | `maps.app.goo.gl`, `goo.gl/maps`, `waze.com/ul/h…` e `maps.apple/p/…` |
 | 📍 **Lugares por nome** | Um link só com o nome do lugar (ex.: *Torre de Belém*) também vira coordenada |
 | 🌐 **Cole na URL do site** | `coordenadas.arqueirover.de/` + o link do mapa → localização limpa |
-| 📱 **Abre direto no app** | No celular, os botões chamam o Waze, Google Maps ou Apple Maps instalado |
+| 📱 **Abre direto no app** | No celular, os botões chamam o app instalado (Waze, Google Maps, Apple Maps, TomTom, HERE, Yandex, Organic Maps) |
+| 🧭 **Escolha os seus serviços** | Waze, Google Maps e Apple Maps vêm ativos; TomTom, HERE WeGo, Yandex Maps, OpenStreetMap, Bing Maps e Organic Maps são opcionais. O mínimo é um |
+| 🌍 **15 idiomas** | Começa no idioma do navegador: português (BR e PT), inglês (US e UK), espanhol, alemão, francês, italiano, holandês, polonês, russo, turco, ucraniano, japonês e chinês |
 | 📋 **Copiar com um toque** | A coordenada (em qualquer formato) ou o link de cada app |
 | 🔳 **QR Code** | Gera um QR com o link da localização, com botão para baixar a imagem |
 | ↗️ **Compartilhar** | Usa a janela de compartilhamento do aparelho (WhatsApp, e-mail…) ou copia o link |
-| 🌗 **Tema claro, escuro ou do sistema** | A escolha fica guardada no navegador |
+| ⚙️ **Configurações** | Tema (sistema, claro ou escuro), idioma e serviços, guardados no navegador sem prazo de expiração |
 | ⚡ **Rápido e leve** | A página já chega pronta do servidor e o fundo de mapa tem só 5 KB |
 | ♿ **Acessível** | Funciona por teclado, com leitor de tela e respeita "reduzir movimento" |
 | 🔒 **Privado** | Sem cadastro, sem login e sem guardar nada seu |
@@ -118,7 +121,12 @@ Os hemisférios podem vir em inglês ou português: **N**, **S**, **E**/**L** (l
 | **Google Maps** | `?q=` · `@lat,lng` · `/place/` · `/search/` · `/dir/` · `?api=1&query=` · `maps.app.goo.gl/…` · domínios regionais (`google.com.br`, `google.pt`…) |
 | **Waze** | `waze.com/ul?ll=` · `live-map/directions?to=ll.` · `waze.com/ul/h…` (link curto) · `waze://` |
 | **Apple Maps** | `?ll=` · `?q=` · `?daddr=` · `/place?coordinate=` · `maps.apple/p/…` · `maps://` |
-| **Outros** | `geo:38.5,-9.0` · OpenStreetMap (`#map=`, `mlat`/`mlon`) · Bing Maps (`cp=`) |
+| **TomTom** | `tomtomgo://x-callback-url/navigate?destination=` · `tomtomhome:geo:action=show&lat=…&long=…` |
+| **HERE WeGo** | `share.here.com/l/LAT,LNG` · `share.here.com/r/…` (rota: primeiro ponto) · `wego.here.com/?map=LAT,LNG,…` |
+| **Yandex Maps** | `yandex.com/maps/?pt=LNG,LAT` (atenção: longitude primeiro) · `maps.yandex.*` · `?rtext=` (rota) · `yandexmaps://` |
+| **Organic Maps** | `omaps.app/LAT,LNG[/nome]` (os códigos curtos `omaps.app/XXXX` e `ge0.me` não são decodificados) |
+| **Outros** | `geo:38.5,-9.0` · `geo:0,0?q=Nome do lugar` (busca por nome) · OpenStreetMap (`#map=`, `mlat`/`mlon`) · Bing Maps (`cp=`, `sp=point.`) |
+| **O próprio site** | `coordenadas.arqueirover.de/?c=…` · `/LAT,LNG` · `/c/…` · `/coord/…` · `/https://maps…` (com ou sem `www`, `http` ou `https`) |
 
 > 💡 Quando o link do Google Maps tem o marcador do lugar (`!3d…!4d…`), é ele que vale, e não o centro do mapa. Assim a coordenada é a do lugar, e não a de onde a tela estava enquadrada.
 
@@ -134,7 +142,7 @@ https://coordenadas.arqueirover.de/https://maps.apple.com/?ll=38.5349,-9.0065
 https://coordenadas.arqueirover.de/38.5349,-9.0065
 ```
 
-Todos viram `https://coordenadas.arqueirover.de/?c=lat,lng`. O endereço antigo `/c/<coordenada>` continua funcionando.
+Todos viram `https://coordenadas.arqueirover.de/?c=lat,lng`. Vale para qualquer link da tabela acima, e o endereço antigo `/c/<coordenada>` continua funcionando.
 
 ### 3. Abrir no app de navegação
 
@@ -143,13 +151,18 @@ Todos viram `https://coordenadas.arqueirover.de/?c=lat,lng`. O endereço antigo 
 <img src="docs/screenshots/05-mobile-escuro.png" width="300" alt="Versão para celular, tema escuro">
 </p>
 
-No celular, a tela mostra só o essencial: a coordenada no topo (toque para copiar, ou no ✏️ para editar) e um botão grande para cada app.
+No celular, a tela mostra só o essencial: a coordenada no topo (toque para copiar, ou no ✏️ para editar) e um botão grande para cada app ativo nas configurações.
 
 | Botão | Android | iPhone / iPad | Computador |
 |---|---|---|---|
 | **Abrir Waze** | Abre o app do Waze | Abre o app do Waze | Abre o Waze no navegador |
 | **Abrir Google Maps** | Abre o app do Google Maps | Abre o app do Google Maps | Abre o Google Maps no navegador |
 | **Abrir Apple Maps** | Abre o Apple Maps na web | Abre o app Mapas | Abre o Apple Maps na web |
+| **Abrir TomTom** | Abre o app do TomTom | Abre o app do TomTom | Abre o TomTom na web |
+| **Abrir HERE WeGo** | Abre o app do HERE | Abre o HERE na web | Abre o HERE na web |
+| **Abrir Yandex Maps** | Abre o app do Yandex | Abre o app do Yandex | Abre o Yandex na web |
+| **Abrir Organic Maps** | Abre o app do Organic Maps | Abre o Organic Maps na web | Abre o Organic Maps na web |
+| **OpenStreetMap / Bing** | Abre na web | Abre na web | Abre na web |
 
 Se o app não estiver instalado, o botão abre a versão web automaticamente. O botão ❐ ao lado copia o link daquele app.
 
@@ -160,15 +173,35 @@ Se o app não estiver instalado, o botão abre a versão web automaticamente. O 
 | Botão | O que faz |
 |---|---|
 | ❐ **Copiar** | Copia a coordenada em decimal (no computador, cada formato tem o seu botão) |
-| 🔳 **QR Code** | Mostra um QR com o link da localização. Quem escanear cai na página com os botões dos três apps. Tem botão para **baixar a imagem** |
+| 🔳 **QR Code** | Mostra um QR com o link da localização. Quem escanear cai na página com os botões dos apps de mapa. Tem botão para **baixar a imagem** |
 | ↗️ **Compartilhar** | Abre a janela de compartilhamento do aparelho; se o navegador não tiver essa opção, copia o link |
 | ↺ **Nova conversão** | Limpa tudo e volta para o campo |
 
-### 5. Tema claro, escuro ou do sistema
+### 5. Configurações
 
 <img src="docs/screenshots/04-escuro.png" width="760" alt="Tema escuro">
 
-No canto do rodapé ficam três botões: 🖥️ **Sistema** (segue o tema do celular ou computador), ☀️ **Claro** e 🌙 **Escuro**. A escolha fica guardada no navegador **por tempo indeterminado** (até você limpar os dados do site) e vale também para as outras abas abertas.
+A engrenagem ⚙️ no canto do rodapé abre a página de **Configurações** (`/config`):
+
+| Opção | O que faz |
+|---|---|
+| 🌗 **Tema** | 🖥️ **Sistema** (segue o celular ou computador), ☀️ **Claro** ou 🌙 **Escuro**. Muda na hora |
+| 🌍 **Idioma** | **Automático** (idioma do navegador) ou um dos 15 idiomas. Muda na hora |
+| 🧭 **Serviços** | Liga e desliga cada app que aparece no resultado, sempre na mesma ordem. Pelo menos um fica ativo: se tentar desligar o último, o site avisa |
+| ℹ️ **Sobre** | Versão, botão **Restaurar padrões** e o download do app Android |
+
+Tudo fica guardado no **seu navegador** (`localStorage`, chave `cfg`) **por tempo indeterminado**, até você limpar os dados do site, e vale também para as outras abas abertas. Diferente do app Android, o site não tem "serviço padrão" de redirecionamento.
+
+#### Como o idioma inicial é escolhido
+
+Pelas mesmas regras do app Android, a partir do idioma do navegador:
+
+- `pt-PT` → português (Portugal); qualquer outro `pt` → português (Brasil)
+- `en-GB`, `AU`, `NZ`, `IE`, `ZA`, `IN` → inglês (UK); outros `en` → inglês (US)
+- `zh` (qualquer) → chinês (simplificado)
+- idioma suportado → ele mesmo; não suportado → inglês (US)
+
+O servidor já entrega a página no idioma do navegador, então ela não "pisca" em outra língua ao abrir.
 
 ### ⌨️ Atalhos e acessibilidade
 
@@ -184,7 +217,7 @@ No canto do rodapé ficam três botões: 🖥️ **Sistema** (segue o tema do ce
 ## 🔒 Privacidade
 
 - **Sem cadastro, sem login e sem cookies de rastreamento.**
-- A única coisa guardada é a **escolha do tema**, e ela fica no **seu** navegador (`localStorage`), não num servidor. No app Android, ficam no aparelho apenas as preferências (tema, idioma, serviços).
+- A única coisa guardada são as **configurações** (tema, idioma e serviços), e elas ficam no **seu** navegador (`localStorage`), não num servidor. No app Android, ficam no aparelho apenas as preferências (tema, idioma, serviços).
 - Coordenadas digitadas são convertidas **no próprio navegador**. Só links curtos ou links sem coordenada passam pelo servidor, e só para descobrir a localização.
 - Quando o link traz só o nome do lugar, esse nome é consultado no serviço de geocodificação (Nominatim ou Google), sem nenhum dado seu junto.
 - Nada do que você cola é salvo.
@@ -197,13 +230,16 @@ Você cola                            O conversor faz
 38.5349, -9.0065                  →  converte na hora, no navegador
 link com coordenada               →  extrai a coordenada da própria URL, no navegador
 link curto (maps.app.goo.gl…)     →  o servidor segue os redirecionamentos até achar a coordenada
-link só com o nome do lugar       →  o servidor busca o lugar pelo nome (geocodificação)
+link só com o nome do lugar       →  o servidor busca o endereço pelo nome, em até 5 tentativas
+mensagem com um link dentro       →  encontra o link na mensagem e segue a partir dele
 /<link> depois do domínio         →  o proxy resolve e redireciona (307) para /?c=lat,lng
 ```
 
 **Segurança:** o servidor só acessa endereços de serviços de mapas conhecidos (Google, Waze e Apple), confere **cada** redirecionamento, tem tempo limite e limite de tamanho. Ele não aceita ser usado como "ponte" para acessar outros sites.
 
-**Geocodificação:** por padrão usa o **Nominatim** (OpenStreetMap), que é gratuito. Se você configurar uma chave da **API do Google**, ela passa a ser usada, com resultados mais precisos.
+**Geocodificação:** por padrão usa o **Nominatim** (OpenStreetMap), que é gratuito. Ele tenta até **5 consultas**, do endereço completo até só a rua, expandindo abreviações (R. → Rua, Av. → Avenida, Tv. → Travessa, Lg. → Largo, Pç. → Praça, Est. → Estrada, Cç. → Calçada), respeitando o limite de 1 consulta por segundo e **nunca** reduzindo a busca a só código postal ou cidade. Se você configurar uma chave da **API do Google**, ela é usada primeiro.
+
+> ⚠️ O site **não** lê o `center=` nem o `[[[alt,lng,lat]` do HTML do Google Maps. Em testes, páginas de lugares diferentes devolveram o **mesmo** valor nesses campos: a posição estimada pelo IP de quem fez o pedido, e não a do lugar. Só o marcador `!3d…!4d…` é usado.
 
 ## 🕰️ Histórico de versões
 
@@ -214,6 +250,16 @@ link só com o nome do lugar       →  o servidor busca o lugar pelo nome (geoc
 - **1.1:** o **TomTom** entrou no lugar do Apple Maps (que não existe no Android) e a tela inicial ganhou título, explicação resumida e formulário centralizado.
 - **1.2:** página de **Configurações** (tema, idioma, serviços), **15 idiomas** a partir do idioma do telefone, escolha dos **serviços** exibidos (mínimo 1) com cinco opcionais, **serviço padrão** que abre direto, **primeira abertura guiada**, leitura de links de HERE, Yandex, Organic Maps, TomTom e do próprio site, visual azul de mapa e novo ícone.
 - **1.2.1:** links curtos do Google Maps passam a ser resolvidos com mais chance de acerto (cookie de consentimento, mais pontos de leitura e busca por endereço como reserva) e as telas ficam **centralizadas na vertical**.
+
+### ⚙️ Versão 3.1: "Do seu jeito, na sua língua"
+**Novembro de 2026**
+
+- Página de **Configurações** (engrenagem no rodapé) com **tema**, **idioma** e **serviços**, guardados no navegador sem prazo de expiração.
+- **15 idiomas**, começando no idioma do navegador (mesmas regras do app Android).
+- **Escolha dos serviços** no resultado (mínimo um): Waze, Google Maps e Apple Maps ativos; **TomTom**, **HERE WeGo**, **Yandex Maps**, **OpenStreetMap**, **Bing Maps** e **Organic Maps** opcionais, todos abrindo direto o app no celular quando existe um.
+- Lê links de **HERE**, **Yandex** (com longitude primeiro), **Organic Maps**, **TomTom**, `ul.waze.com`, `geo:0,0?q=Nome`, **o próprio site** e **mensagens de compartilhamento** com o link dentro.
+- Busca de endereço em **várias tentativas** para links curtos do Google sem coordenada.
+- Botão **Baixe o app para Android** também na página do resultado.
 
 ### 🚀 Versão 3.0: "Cara nova e entende qualquer link"
 **Novembro de 2026**
@@ -289,13 +335,16 @@ npm run dev          # abre em http://localhost:3000
 | `src/components/converter.tsx` | Formulário e estado da tela |
 | `src/components/results.tsx` | Cards da coordenada e botões dos apps |
 | `src/components/qr-dialog.tsx` | Janela do QR Code (a biblioteca só carrega quando é usada) |
-| `src/components/theme.tsx` | Seletor de tema Sistema/Claro/Escuro |
+| `src/app/config/page.tsx` · `src/components/settings-view.tsx` | Página de Configurações |
+| `src/components/settings-provider.tsx` · `src/lib/settings.ts` | Configurações salvas (`localStorage`), idioma e tema |
+| `src/i18n/languages.ts` · `src/i18n/messages.ts` | Os 15 idiomas, a detecção do idioma e as traduções |
+| `src/lib/services.ts` | Serviços de mapa: nome, ícone, link web e link do app |
 | `src/components/map-background.tsx` | Fundo de mapa com efeito de profundidade leve |
 | `src/lib/coordinates.ts` | Leitura e formatação de coordenadas (DD, DMS, DDM) |
 | `src/lib/map-urls.ts` | Leitura de links de mapas e geração dos links dos apps |
 | `src/lib/deep-links.ts` | Links que abrem direto os apps no Android e no iPhone |
 | `src/lib/android-release.ts` | Busca no GitHub a release Android mais recente para o botão de download |
-| `src/lib/resolve.ts` | Resolução de links no servidor, com as proteções de segurança |
+| `src/lib/resolve.ts` · `src/lib/geocode-queries.ts` | Resolução de links no servidor (com as proteções de segurança) e busca de endereço em etapas |
 | `src/lib/*.test.ts` | Testes automáticos |
 
 ## 🤝 Código aberto: contribua!

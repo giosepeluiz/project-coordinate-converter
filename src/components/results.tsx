@@ -3,22 +3,9 @@
 import Image from "next/image";
 import { formatDecimal, formatDms, type LatLng } from "@/lib/coordinates";
 import { openInApp } from "@/lib/deep-links";
-import { appLink, type MapApp } from "@/lib/map-urls";
-import {
-  CopyIcon,
-  EditIcon,
-  ExternalIcon,
-  PinIcon,
-  QrIcon,
-  ResetIcon,
-  ShareIcon,
-} from "./icons";
-
-const APPS: { id: MapApp; name: string; logo: string }[] = [
-  { id: "waze", name: "Waze", logo: "/assets/waze.svg" },
-  { id: "googlemaps", name: "Google Maps", logo: "/assets/google-maps.svg" },
-  { id: "applemaps", name: "Apple Maps", logo: "/assets/apple-maps.png" },
-];
+import { SERVICES } from "@/lib/services";
+import { CopyIcon, EditIcon, ExternalIcon, PinIcon, QrIcon, ResetIcon, ShareIcon } from "./icons";
+import { useSettings } from "./settings-provider";
 
 const card =
   "rounded-2xl bg-white/90 shadow-md ring-1 ring-black/5 backdrop-blur dark:bg-gray-900/85 dark:ring-white/10";
@@ -29,7 +16,7 @@ const secondaryButton =
 
 type Props = {
   coords: LatLng;
-  onCopy: (text: string, what: string) => void;
+  onCopy: (text: string, kind: "coord" | "link") => void;
   onQr: () => void;
   onShare: () => void;
   onReset: () => void;
@@ -37,8 +24,11 @@ type Props = {
 };
 
 export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit }: Props) {
+  const { t, settings } = useSettings();
   const decimal = formatDecimal(coords);
   const dms = formatDms(coords);
+  // Só os serviços ativos nas configurações, na ordem fixa.
+  const services = SERVICES.filter((s) => settings.services.includes(s.id));
 
   return (
     <div className="animate-fade-in-up space-y-3 md:space-y-4">
@@ -47,15 +37,15 @@ export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit }: Prop
         <PinIcon className="shrink-0 text-emerald-600 dark:text-emerald-400" />
         <button
           type="button"
-          onClick={() => onCopy(decimal, "Coordenada")}
+          onClick={() => onCopy(decimal, "coord")}
           className="min-w-0 flex-1 text-left"
-          aria-label={`Copiar coordenada ${decimal}`}>
+          aria-label={`${t("copyCoord")}: ${decimal}`}>
           <span className="block truncate font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">
             {decimal}
           </span>
           <span className="block truncate font-mono text-xs text-gray-500 dark:text-gray-400">{dms}</span>
         </button>
-        <button type="button" onClick={onEdit} className={iconButton} aria-label="Editar coordenada">
+        <button type="button" onClick={onEdit} className={iconButton} aria-label={t("editCoord")}>
           <EditIcon width={18} height={18} />
         </button>
       </div>
@@ -63,28 +53,28 @@ export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit }: Prop
       {/* Desktop: conversão nos dois formatos */}
       <section className={`${card} hidden p-6 md:block`} aria-labelledby="conv-title">
         <h2 id="conv-title" className="mb-4 text-sm font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Coordenada identificada
+          {t("identified")}
         </h2>
         <dl className="grid gap-3">
           {[
-            { label: "Decimal (DD)", value: decimal },
-            { label: "Graus, min, seg (DMS)", value: dms },
+            { label: t("decimalLabel"), value: decimal },
+            { label: t("dmsLabel"), value: dms },
           ].map((row) => (
             <div key={row.label} className="flex items-center gap-3">
               <dt className="w-44 shrink-0 text-sm text-gray-500 dark:text-gray-400">{row.label}</dt>
               <dd className="flex min-w-0 flex-1 items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => onCopy(row.value, "Coordenada")}
-                  title="Clique para copiar"
+                  onClick={() => onCopy(row.value, "coord")}
+                  title={t("clickToCopy")}
                   className="min-w-0 flex-1 truncate rounded-lg bg-gray-100 px-3 py-2.5 text-left font-mono text-gray-800 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
                   {row.value}
                 </button>
                 <button
                   type="button"
-                  onClick={() => onCopy(row.value, "Coordenada")}
+                  onClick={() => onCopy(row.value, "coord")}
                   className={iconButton}
-                  aria-label={`Copiar ${row.label}`}>
+                  aria-label={`${t("copy")}: ${row.label}`}>
                   <CopyIcon />
                 </button>
               </dd>
@@ -94,32 +84,34 @@ export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit }: Prop
       </section>
 
       {/* Apps de navegação */}
-      <ul className="space-y-3 md:space-y-4" aria-label="Abrir em um aplicativo">
-        {APPS.map((app) => {
-          const href = appLink(app.id, coords);
+      <ul className="space-y-3 md:space-y-4" aria-label={t("openIn")}>
+        {services.map((s) => {
+          const href = s.web(coords);
           return (
-            <li key={app.id} className={`${card} flex items-center gap-3 p-3 md:p-4`}>
-              <Image src={app.logo} alt="" width={44} height={44} className="size-11 shrink-0 rounded-lg" />
+            <li key={s.id} className={`${card} flex items-center gap-3 p-3 md:p-4`}>
+              <Image src={s.logo} alt="" width={44} height={44} className="size-11 shrink-0 rounded-lg" />
               <span className="hidden min-w-0 flex-1 md:block">
-                <span className="block font-semibold text-gray-900 dark:text-gray-100">{app.name}</span>
+                <span className="block font-semibold text-gray-900 dark:text-gray-100">{s.name}</span>
                 <span className="block truncate font-mono text-xs text-gray-500 dark:text-gray-400">{href}</span>
               </span>
               <button
                 type="button"
-                onClick={() => onCopy(href, `Link do ${app.name}`)}
+                onClick={() => onCopy(href, "link")}
                 className={iconButton}
-                aria-label={`Copiar link do ${app.name}`}>
+                aria-label={t("copyLinkOf", { app: s.name })}>
                 <CopyIcon />
               </button>
               <a
                 href={href}
-                onClick={(e) => openInApp(e, app.id, coords)}
+                onClick={(e) => openInApp(e, s.id, coords)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-11 min-w-0 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-emerald-600 px-3 text-sm font-bold uppercase text-white transition-colors hover:bg-emerald-700 md:flex-none md:px-4 md:tracking-wide">
-                <span className="md:hidden">Abrir {app.name}</span>
-                <span className="hidden md:inline">Abrir</span>
-                <ExternalIcon width={18} height={18} />
+                aria-label={t("openApp", { app: s.name })}
+                className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-bold uppercase text-white transition-colors hover:bg-emerald-700 md:flex-none md:px-4 md:tracking-wide">
+                {/* Traduções longas quebram em duas linhas em vez de cortar. */}
+                <span className="text-balance text-center leading-tight md:hidden">{t("openApp", { app: s.name })}</span>
+                <span className="hidden whitespace-nowrap md:inline">{t("open")}</span>
+                <ExternalIcon width={18} height={18} className="shrink-0" />
               </a>
             </li>
           );
@@ -128,21 +120,21 @@ export function Results({ coords, onCopy, onQr, onShare, onReset, onEdit }: Prop
 
       {/* Ações */}
       <div className="grid grid-cols-2 gap-3 pt-1 md:flex md:justify-center">
-        <button type="button" onClick={() => onCopy(decimal, "Coordenada")} className={`${secondaryButton} md:hidden`}>
-          <CopyIcon width={18} height={18} className="text-emerald-600" />
-          Copiar
+        <button type="button" onClick={() => onCopy(decimal, "coord")} className={`${secondaryButton} md:hidden`}>
+          <CopyIcon width={18} height={18} className="shrink-0 text-emerald-600" />
+          {t("copy")}
         </button>
         <button type="button" onClick={onQr} className={secondaryButton}>
-          <QrIcon width={18} height={18} className="text-emerald-600" />
-          QR Code
+          <QrIcon width={18} height={18} className="shrink-0 text-emerald-600" />
+          {t("qrCode")}
         </button>
         <button type="button" onClick={onShare} className={secondaryButton}>
-          <ShareIcon width={18} height={18} className="text-emerald-600" />
-          Compartilhar
+          <ShareIcon width={18} height={18} className="shrink-0 text-emerald-600" />
+          {t("share")}
         </button>
         <button type="button" onClick={onReset} className={secondaryButton}>
-          <ResetIcon width={18} height={18} className="text-emerald-600" />
-          Nova conversão
+          <ResetIcon width={18} height={18} className="shrink-0 text-emerald-600" />
+          {t("newConversion")}
         </button>
       </div>
     </div>

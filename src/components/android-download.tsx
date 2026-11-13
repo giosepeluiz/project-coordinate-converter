@@ -1,4 +1,7 @@
+"use client";
+
 import type { AndroidRelease } from "@/lib/android-release";
+import { useSettings } from "./settings-provider";
 
 /** Robô do Android (desenho simplificado), na cor oficial #3DDC84. */
 function AndroidIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -16,26 +19,43 @@ function formatSize(bytes: number | null): string | null {
   if (!bytes) return null;
   return bytes < 1024 * 1024
     ? `${Math.max(1, Math.round(bytes / 1024))} KB`
-    : `${(bytes / (1024 * 1024)).toFixed(1).replace(".", ",")} MB`;
+    : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+type Props = {
+  release: AndroidRelease;
+  /** "card": dentro do formulário, separado por uma linha. "standalone": abaixo do resultado. */
+  variant?: "card" | "standalone";
+};
+
 /**
- * Botão discreto de download do APK, direto do GitHub Releases.
+ * Botão de download do APK, direto do GitHub Releases.
  * O GitHub envia o arquivo como anexo, então o download começa na hora.
  */
-export function AndroidDownload({ release }: { release: AndroidRelease }) {
+export function AndroidDownload({ release, variant = "card" }: Props) {
+  const { t } = useSettings();
   const size = formatSize(release.size);
+  const wrapper =
+    variant === "card"
+      ? "mt-8 flex justify-center border-t border-gray-200/80 pt-7 dark:border-white/10"
+      : "flex justify-center pt-5 md:pt-6";
+  const surface =
+    variant === "card"
+      ? "bg-gray-50 dark:bg-gray-800/60"
+      : "bg-white/90 shadow-md backdrop-blur dark:bg-gray-900/85";
+
   return (
-    // Separado do formulário por uma linha fina, com bastante respiro.
-    <div className="mt-8 flex justify-center border-t border-gray-200/80 pt-7 dark:border-white/10">
+    <div className={wrapper}>
       <a
         href={release.url}
         rel="noopener"
-        className="group inline-flex min-h-14 items-center gap-3 rounded-full bg-gray-50 py-2.5 pl-2.5 pr-6 text-[15px] ring-1 ring-black/10 transition hover:bg-white hover:ring-[#3DDC84]/60 dark:bg-gray-800/60 dark:ring-white/10 dark:hover:bg-gray-800 dark:hover:ring-[#3DDC84]/50">
+        className={`group inline-flex min-h-14 max-w-full items-center gap-3 rounded-full py-2.5 pl-2.5 pr-6 text-[15px] ring-1 ring-black/10 transition hover:bg-white hover:ring-[#3DDC84]/60 dark:ring-white/10 dark:hover:bg-gray-800 dark:hover:ring-[#3DDC84]/50 ${surface}`}>
         <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#3DDC84]/15">
           <AndroidIcon width={22} height={22} />
         </span>
-        <span className="whitespace-nowrap font-semibold text-gray-800 dark:text-gray-100">Baixar o app para Android</span>
+        <span className="text-balance font-semibold leading-tight text-gray-800 dark:text-gray-100">
+          {t("androidDownload")}
+        </span>
         <span className="hidden text-xs text-gray-500 sm:inline dark:text-gray-400">
           v{release.version} · APK{size ? ` · ${size}` : ""}
         </span>

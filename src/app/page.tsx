@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getAndroidRelease, isIOS } from "@/lib/android-release";
 import { Converter } from "@/components/converter";
-import { NOT_FOUND_MESSAGE } from "@/lib/messages";
+import { translator } from "@/i18n/messages";
+import { getServerLang } from "@/i18n/server";
+import { getAndroidRelease, isIOS } from "@/lib/android-release";
 import { formatDecimal, formatDms, toParam } from "@/lib/coordinates";
 import { parseInput } from "@/lib/map-urls";
 
@@ -15,8 +16,9 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const sp = await searchParams;
   const coords = parseInput(first(sp.c) ?? "");
   if (!coords) return {};
-  const title = `${formatDecimal(coords)} · Conversor de Coordenadas`;
-  const description = `${formatDms(coords)} — abra no Waze, Google Maps ou Apple Maps.`;
+  const t = translator(await getServerLang());
+  const title = `${formatDecimal(coords)} · ${t("appTitle")}`;
+  const description = t("metaCoord", { dms: formatDms(coords) });
   return {
     title,
     description,
@@ -45,7 +47,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
     <Converter
       initialInput={coords ? formatDecimal(coords) : raw}
       initialCoords={coords}
-      initialError={raw && !coords ? NOT_FOUND_MESSAGE : null}
+      initialError={!!raw && !coords}
       androidApp={androidApp}
     />
   );

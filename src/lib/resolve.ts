@@ -1,15 +1,19 @@
 import "server-only";
 import { parseCoordinates, type LatLng } from "./coordinates";
+import { geocodeQueries } from "./geocode-queries";
 import {
   extractFromUrl,
+  extractUrlFromText,
   isAppleMaps,
   isGoogleMaps,
   isGoogleShort,
   isMapUrl,
+  isSite,
   isWaze,
   parseInput,
   placeQuery,
   toUrl,
+  unwrapSiteUrl,
 } from "./map-urls";
 
 /**
@@ -26,10 +30,13 @@ const UA =
 const MAX_REDIRECTS = 5;
 const MAX_BYTES = 1_500_000;
 const TIMEOUT_MS = 6000;
+/** Política do Nominatim: no máximo 1 requisição por segundo. */
+const NOMINATIM_GAP_MS = 1100;
 
 const canFetch = (u: URL) =>
-  u.protocol === "https:" &&
-  (isGoogleShort(u) || isGoogleMaps(u) || isWaze(u) || isAppleMaps(u));
+  u.protocol === "https:" && (isGoogleShort(u) || isGoogleMaps(u) || isWaze(u) || isAppleMaps(u));
+
+const isGoogleHost = (u: URL) => isGoogleShort(u) || /(^|\.)google\.[a-z.]+$/.test(u.hostname);
 
 async function readLimited(res: Response): Promise<string> {
   if (!res.body) return "";
@@ -52,9 +59,15 @@ async function follow(start: URL): Promise<{ url: URL; html: string }> {
     if (!canFetch(url)) break;
     // Se a URL atual já tem coordenadas, não precisa continuar.
     if (i > 0 && extractFromUrl(url)) return { url, html: "" };
+    const headers: Record<string, string> = {
+      "User-Agent": UA,
+      "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+    };
+    // Evita a página de consentimento de cookies do Google na Europa.
+    if (isGoogleHost(url)) headers.Cookie = "SOCS=CAI; CONSENT=YES+";
     const res = await fetch(url, {
       redirect: "manual",
-      headers: { "User-Agent": UA, "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8" },
+      headers,
       signal: AbortSignal.timeout(TIMEOUT_MS),
       cache: "no-store",
     });
@@ -70,6 +83,11 @@ async function follow(start: URL): Promise<{ url: URL; html: string }> {
   return { url, html: "" };
 }
 
+/**
+ * Coordenadas confiáveis dentro do HTML. Não usa o "center=", o
+ * "[[[alt,lng,lat]" nem o "/@lat,lng" do Google: em páginas de lugar por nome,
+ * eles trazem a posição estimada pelo IP de quem pediu, e não a do lugar.
+ */
 function fromHtml(html: string): LatLng | null {
   if (!html) return null;
   const meta = (prop: string) =>
@@ -86,7 +104,7 @@ function fromHtml(html: string): LatLng | null {
     const c = parseCoordinates(geo.replace(";", ","));
     if (c) return c;
   }
-  // Google: posição do marcador do lugar
+  // Google: marcador do lugar (o "@lat,lng" do HTML pode ser só o centro da tela)
   const pin = html.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
   if (pin) return parseCoordinates(`${pin[1]},${pin[2]}`);
   return null;
@@ -99,33 +117,40 @@ function remember(key: string, value: LatLng) {
   return value;
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function nominatim(query: string): Promise<LatLng | null> {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`,
+    {
+      headers: {
+        "User-Agent": process.env.NOMINATIM_USER_AGENT ?? "conversor-de-coordenadas/1.0",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+      },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    },
+  );
+  const data = await res.json();
+  return Array.isArray(data) && data[0] ? parseCoordinates(`${data[0].lat},${data[0].lon}`) : null;
+}
+
 async function geocode(query: string): Promise<LatLng | null> {
-  const key = process.env.GOOGLE_MAPS_API_KEY;
   try {
+    const key = process.env.GOOGLE_MAPS_API_KEY;
     if (key) {
       const res = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${key}`,
         { signal: AbortSignal.timeout(TIMEOUT_MS) },
       );
-      const data = await res.json();
-      const loc = data?.results?.[0]?.geometry?.location;
+      const loc = (await res.json())?.results?.[0]?.geometry?.location;
       if (loc) return parseCoordinates(`${loc.lat},${loc.lng}`);
-      return null;
     }
-    // Sem chave do Google: usa o Nominatim (OpenStreetMap), gratuito.
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`,
-      {
-        headers: {
-          "User-Agent": process.env.NOMINATIM_USER_AGENT ?? "conversor-de-coordenadas/1.0",
-          "Accept-Language": "pt-BR,pt;q=0.9",
-        },
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      },
-    );
-    const data = await res.json();
-    if (Array.isArray(data) && data[0]) {
-      return parseCoordinates(`${data[0].lat},${data[0].lon}`);
+    // Nominatim (OpenStreetMap): até 5 tentativas, do endereço completo até só a rua.
+    const queries = geocodeQueries(query);
+    for (let i = 0; i < queries.length; i++) {
+      if (i > 0) await sleep(NOMINATIM_GAP_MS);
+      const found = await nominatim(queries[i]);
+      if (found) return found;
     }
   } catch (err) {
     console.error("Falha ao geocodificar:", err);
@@ -134,12 +159,24 @@ async function geocode(query: string): Promise<LatLng | null> {
 }
 
 /** Resolve coordenadas de qualquer entrada, acessando a rede só quando necessário. */
-export async function resolveInput(input: string): Promise<LatLng | null> {
+export async function resolveInput(input: string, depth = 0): Promise<LatLng | null> {
   const local = parseInput(input);
   if (local) return local;
+  if (depth > 2) return null;
 
   const start = toUrl(input);
-  if (!start || !isMapUrl(start)) return null;
+  // Texto de compartilhamento: "Nome do lugar https://maps.app.goo.gl/…"
+  if (!start) {
+    const inText = extractUrlFromText(input);
+    return inText && inText !== input.trim() ? resolveInput(inText, depth + 1) : null;
+  }
+  if (!isMapUrl(start)) return null;
+
+  // Link do próprio site com um link de mapa dentro: resolve o de dentro.
+  if (isSite(start)) {
+    const inner = unwrapSiteUrl(start);
+    return inner ? resolveInput(inner, depth + 1) : null;
+  }
 
   const key = start.href;
   if (cache.has(key)) return cache.get(key)!;

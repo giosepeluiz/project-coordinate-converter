@@ -92,7 +92,40 @@ export const DownloadIcon = (p: IconProps) => (
   </Icon>
 );
 
-export const Spinner = (p: IconProps) => (
+export const GearIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+    <circle cx="12" cy="12" r="3" />
+  </Icon>
+);
+
+export const BackIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="m15 18-6-6 6-6" />
+  </Icon>
+);
+
+export const MonitorIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="2" y="3" width="20" height="14" rx="2" />
+    <path d="M8 21h8M12 17v4" />
+  </Icon>
+);
+
+export const SunIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </Icon>
+);
+
+export const MoonIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </Icon>
+);
+
+export const Spinner =(p: IconProps) => (
   <Icon {...p} className={`animate-spin ${p.className ?? ""}`}>
     <path d="M21 12a9 9 0 1 1-6.22-8.56" />
   </Icon>
