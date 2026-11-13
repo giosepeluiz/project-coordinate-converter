@@ -26,13 +26,14 @@ function formatSize(bytes: number | null): string | null {
 export function AndroidDownload({ release }: { release: AndroidRelease }) {
   const size = formatSize(release.size);
   return (
-    <div className="mt-5 flex justify-center">
+    // Separado do formulário por uma linha fina, com bastante respiro.
+    <div className="mt-8 flex justify-center border-t border-gray-200/80 pt-7 dark:border-white/10">
       <a
         href={release.url}
         rel="noopener"
-        className="group inline-flex items-center gap-2.5 rounded-full bg-gray-50 py-1.5 pl-2 pr-4 text-sm ring-1 ring-black/10 transition hover:bg-white hover:ring-[#3DDC84]/60 dark:bg-gray-800/60 dark:ring-white/10 dark:hover:bg-gray-800 dark:hover:ring-[#3DDC84]/50">
-        <span className="flex size-7 items-center justify-center rounded-full bg-[#3DDC84]/15">
-          <AndroidIcon width={18} height={18} />
+        className="group inline-flex min-h-14 items-center gap-3 rounded-full bg-gray-50 py-2.5 pl-2.5 pr-6 text-[15px] ring-1 ring-black/10 transition hover:bg-white hover:ring-[#3DDC84]/60 dark:bg-gray-800/60 dark:ring-white/10 dark:hover:bg-gray-800 dark:hover:ring-[#3DDC84]/50">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#3DDC84]/15">
+          <AndroidIcon width={22} height={22} />
         </span>
         <span className="whitespace-nowrap font-semibold text-gray-800 dark:text-gray-100">Baixar o app para Android</span>
         <span className="hidden text-xs text-gray-500 sm:inline dark:text-gray-400">
