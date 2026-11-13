@@ -10,15 +10,19 @@ import { MapBackground } from "./map-background";
 import { QrDialog } from "./qr-dialog";
 import { Results, ResultsSkeleton } from "./results";
 import { ThemeToggle } from "./theme";
+import { AndroidDownload } from "./android-download";
+import type { AndroidRelease } from "@/lib/android-release";
 import { Toast, useToast } from "./toast";
 
 type Props = {
   initialInput: string;
   initialCoords: LatLng | null;
   initialError: string | null;
+  /** Release do app Android; null esconde o botão (ex.: iPhone). */
+  androidApp: AndroidRelease | null;
 };
 
-export function Converter({ initialInput, initialCoords, initialError }: Props) {
+export function Converter({ initialInput, initialCoords, initialError, androidApp }: Props) {
   const [input, setInput] = useState(initialInput);
   const [coords, setCoords] = useState<LatLng | null>(initialCoords);
   const [error, setError] = useState<string | null>(initialError);
@@ -191,6 +195,9 @@ export function Converter({ initialInput, initialCoords, initialError }: Props) 
               </p>
             )
           )}
+
+          {/* Só na tela inicial: a tela de resultado continua enxuta. */}
+          {!coords && androidApp && <AndroidDownload release={androidApp} />}
         </section>
 
         {loading && <ResultsSkeleton />}

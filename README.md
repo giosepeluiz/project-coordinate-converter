@@ -74,7 +74,7 @@ Além do site, existe um **app para Android** com tudo o que o site faz, mais o 
 
 ### Como instalar
 
-1. Abra a página de **[Releases](https://github.com/giosepeluiz/project-coordinate-converter/releases/latest)** no celular e baixe o arquivo `Conversor-de-Coordenadas-….apk`.
+1. No celular, abra o **[site](https://coordenadas.arqueirover.de)** e toque em **Baixar o app para Android**, logo abaixo do campo (o download do `.apk` começa na hora). Também dá para baixar pela página de **[Releases](https://github.com/giosepeluiz/project-coordinate-converter/releases/latest)**: é o arquivo `Conversor-de-Coordenadas-….apk`.
 2. Abra o arquivo. Se o Android pedir, permita a instalação por esse navegador ou gerenciador de arquivos (*Instalar apps desconhecidos*).
 3. Abra o app e faça a primeira configuração.
 
@@ -294,6 +294,7 @@ npm run dev          # abre em http://localhost:3000
 | `src/lib/coordinates.ts` | Leitura e formatação de coordenadas (DD, DMS, DDM) |
 | `src/lib/map-urls.ts` | Leitura de links de mapas e geração dos links dos apps |
 | `src/lib/deep-links.ts` | Links que abrem direto os apps no Android e no iPhone |
+| `src/lib/android-release.ts` | Busca no GitHub a release Android mais recente para o botão de download |
 | `src/lib/resolve.ts` | Resolução de links no servidor, com as proteções de segurança |
 | `src/lib/*.test.ts` | Testes automáticos |
 
